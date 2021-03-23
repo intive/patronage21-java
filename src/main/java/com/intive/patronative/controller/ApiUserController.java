@@ -2,7 +2,9 @@ package com.intive.patronative.controller;
 
 import com.intive.patronative.model.UserDTO;
 import com.intive.patronative.service.UserService;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
