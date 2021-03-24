@@ -14,5 +14,4 @@ public class UserService {
     public void update(UserDTO userDTO) {
         log.info("Evoking service...");
     }
-
 }
