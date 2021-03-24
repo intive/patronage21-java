@@ -1,4 +1,4 @@
-package com.intive.patronative.controller.api;
+package com.intive.patronative.controller;
 
 import com.intive.patronative.model.UserDTO;
 import com.intive.patronative.service.UserService;
@@ -14,7 +14,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class ApiUserController {
 
     private final UserService userService;
 
