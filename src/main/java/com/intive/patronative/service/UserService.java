@@ -20,5 +20,4 @@ public class UserService {
     public void findBy(Map<String, String> params){
         log.info("Evoking service to find users...");
     }
-
 }
