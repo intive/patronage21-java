@@ -1,6 +1,6 @@
 package com.intive.patronative.controller;
 
-import com.intive.patronative.model.UserDTO;
+import com.intive.patronative.dto.profile.User;
 import com.intive.patronative.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,7 +18,7 @@ public class ApiUserController {
     private final UserService userService;
 
     @PutMapping
-    public void updateUser(@Valid @RequestBody UserDTO userDTO){
+    public void updateUser(@Valid @RequestBody User userDTO) {
         userService.update(userDTO);
     }
 
