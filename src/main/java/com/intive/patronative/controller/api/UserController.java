@@ -18,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping
-    public void update(@Valid @RequestBody User userDTO){
+    public void update(@Valid @RequestBody final User userDTO){
         userService.update(userDTO);
     }
 
