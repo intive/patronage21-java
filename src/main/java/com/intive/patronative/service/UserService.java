@@ -1,7 +1,6 @@
 package com.intive.patronative.service;
 
-import com.intive.patronative.model.User;
-import com.intive.patronative.model.UserDTO;
+import com.intive.patronative.dto.profile.User;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 public class UserService {
 
-    public void update(UserDTO userDTO) {
+    public void update(final User user) {
         log.info("Evoking service...");
     }
 }

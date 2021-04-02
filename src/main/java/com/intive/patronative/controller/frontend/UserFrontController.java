@@ -1,6 +1,6 @@
-package com.intive.patronative.controller;
+package com.intive.patronative.controller.frontend;
 
-import com.intive.patronative.model.UserDTO;
+import com.intive.patronative.dto.profile.User;
 import com.intive.patronative.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/frontend-api/users")
 @RequiredArgsConstructor
-public class ApiUserController {
+public class UserFrontController {
 
     private final UserService userService;
 
     @PutMapping
-    public void updateUser(@Valid @RequestBody UserDTO userDTO){
-        userService.update(userDTO);
+    public void updateUser(@Valid @RequestBody final User user){
+        userService.update(user);
     }
 
 }
