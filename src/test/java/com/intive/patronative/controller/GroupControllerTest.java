@@ -1,9 +1,6 @@
 package com.intive.patronative.controller;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
 import com.intive.patronative.dto.group.Groups;
 import com.intive.patronative.service.GroupService;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +17,6 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(GroupController.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class GroupControllerTest {
     private final String GROUPS_ENDPOINT = "/api/groups";
 
@@ -30,10 +26,8 @@ class GroupControllerTest {
     private GroupService service;
 
     @Test
-    @Order(1)
     public void groups() throws Exception {
         when(service.getGroups()).thenReturn(new Groups(List.of(("Android"), ("Embedded"))));
-
         this.mockMvc.perform(MockMvcRequestBuilders.get(GROUPS_ENDPOINT))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
