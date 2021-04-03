@@ -18,7 +18,7 @@ public class UserFrontController {
     private final UserService userService;
 
     @PutMapping
-    public void updateUser(@Valid @RequestBody final User user){
+    public void updateUser(@Valid @RequestBody final User user) {
         userService.update(user);
     }
 
