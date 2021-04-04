@@ -1,4 +1,4 @@
-package com.intive.patronative.controller;
+package com.intive.patronative.controller.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +7,8 @@ import com.intive.patronative.service.GroupService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,13 +19,13 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<Groups> groups() {
-        Groups groups = groupService.getGroups();
+        Optional<Groups> groups = Optional.of(groupService.getGroups());
 
-        if ((groups.getGroups() == null) || groups.getGroups().isEmpty()) {
+        if (groups.isEmpty() || groups.get().getGroups().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok().body(groups);
+        return ResponseEntity.ok().body(groups.get());
     }
 
 }
