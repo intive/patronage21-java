@@ -26,7 +26,7 @@ class GroupServiceTest {
         when(groupRepository.getAllGroups()).thenReturn(List.of(
                 new Group("Android"),
                 new Group("Embedded")));
-        var groups = groupService.getGroups();
+        final var groups = groupService.getGroups();
         assertThat(groups).isEqualTo(new Groups(List.of("Android", "Embedded")));
     }
 }

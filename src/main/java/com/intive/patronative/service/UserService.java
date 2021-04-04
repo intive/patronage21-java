@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 public class UserService {
 
-    public void update(User userDTO) {
+    public void update(final User user) {
         log.info("Evoking service...");
     }
 }
