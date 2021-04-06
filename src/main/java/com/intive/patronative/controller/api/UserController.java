@@ -26,10 +26,11 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getUserByRole(@Valid @RequestParam UserRole userRole) {
-        if (userService.getUserByRole(userRole) == null || userService.getUserByRole(userRole).isEmpty()) {
+        List<UserDto> users = userService.getUserByRole(userRole);
+        if (users == null || users.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<>(userService.getUserByRole(userRole), HttpStatus.OK);
+            return new ResponseEntity<>(users, HttpStatus.OK);
         }
     }
 }
