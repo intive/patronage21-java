@@ -1,7 +1,7 @@
 package com.intive.patronative.utils;
 
-import com.intive.patronative.model.User;
-import com.intive.patronative.model.UserDto;
+import com.intive.patronative.dto.profile.User;
+import com.intive.patronative.dto.profile.UserDto;
 
 public class UserMapper {
     public static UserDto mapToUserDto(User user) {
@@ -10,7 +10,7 @@ public class UserMapper {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
-                .githubUrl(user.getGithubUrl())
+                .gitHubUrl(user.getGitHubUrl())
                 .userName(user.getUserName())
                 .build();
     }
