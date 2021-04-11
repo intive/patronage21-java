@@ -17,9 +17,9 @@ public class UserControllerValidationHandlerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    ValidationErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e){
+    ValidationErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException validationException){
         final var error = new ValidationErrorResponse();
-        for (final var fieldError : e.getBindingResult().getFieldErrors()) {
+        for (final var fieldError : validationException.getBindingResult().getFieldErrors()) {
             error.getViolationErrors().add(new ViolationError(fieldError.getField(), fieldError.getRejectedValue(), fieldError.getDefaultMessage()));
         }
         return error;
