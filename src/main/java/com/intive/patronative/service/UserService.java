@@ -1,20 +1,41 @@
 package com.intive.patronative.service;
 
+import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.dto.model.UserDTO;
+import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.profile.User;
-import lombok.NoArgsConstructor;
+import com.intive.patronative.exception.InvalidArgumentException;
+import com.intive.patronative.validation.UserSearchValidator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Slf4j
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
-    public void saveUser(UserDTO dto){
+    private final UserSearchValidator userSearchValidator;
+
+    public void saveUser(UserDTO dto) {
     }
 
     public void update(final User user) {
         log.info("Evoking service...");
     }
+
+    public UsersDTO searchUser(final UserSearchDTO userSearchDTO) throws InvalidArgumentException {
+        log.info("Called userService");
+
+        userSearchValidator.validateSearchParameters(userSearchDTO);
+
+        return UsersDTO.builder()
+                .users(Arrays.asList(new UserDTO("someLogin", "Lucas", "Smith", "lsmith", "lsmith@gmail.com", "123456789", "lsmith"),
+                        new UserDTO("someLogin1", "Mark", "Marcuson", "mmarcuson", "marcuson@gmail.com", "98765421", "marcuson"),
+                        new UserDTO("someLogin2", "Dick", "Hunt", "hdick", "hdick@gmail.com", "654987321", "hdick")))
+                .build();
+    }
+
 }

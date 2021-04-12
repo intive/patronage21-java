@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenAPIConfig {
+
     @Bean
     public OpenAPI patronativeOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("Patronative API")
                 .description("Users module")
                 .version("v0.0.1"));
-
     }
-    
+
 }

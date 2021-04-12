@@ -18,13 +18,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity<String> saveUser(@Valid @RequestBody UserDTO userDTO){
+    public ResponseEntity<String> saveUser(@Valid @RequestBody UserDTO userDTO) {
         userService.saveUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body("User saved");
     }
 
     @PutMapping
-    public void update(@Valid @RequestBody final User userDTO){
+    public void update(@Valid @RequestBody final User userDTO) {
         userService.update(userDTO);
     }
 
