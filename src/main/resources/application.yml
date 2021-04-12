@@ -1,1 +1,12 @@
-
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/patronative
+    username: admin
+    password: p4tron4tiv3
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        globally_quoted_identifiers: true
