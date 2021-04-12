@@ -27,11 +27,6 @@ The application supports following user management operations:
 You can find swagger under following link http://localhost:8080/swagger-ui.html. \
 It will be reachable once you start the application.
 
-## PostgreSQL
-
-You can find Adminer for manage database under following link http://localhost:8085
-It will be reachable once you start the docker container. 
-
 ## Prerequisites
 To build and run this project, you will need:
 * JDK 11 - installation guide -> https://docs.oracle.com/en/java/javase/11/install
