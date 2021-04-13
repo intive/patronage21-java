@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Value
 public class UserDTO {
+    @NotBlank(message = "Can not be empty") String login;
     @NotBlank(message = "Can not be empty") String firstName;
     @NotBlank(message = "Can not be empty") String lastName;
     @Email(message = "Must be correct email address")
