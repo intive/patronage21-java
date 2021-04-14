@@ -1,13 +1,12 @@
 version: '3.9'
 services:
   postgres:
-    image: library/postgres:latest
+    image: postgres:latest
     container_name: patronative_db
-    restart: always
     ports:
       - 5432:5432
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: p4tron4tiv3

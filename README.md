@@ -198,8 +198,26 @@ Data to access database:
 - `SYSTEM`: **PostgreSQL**
 - `SERVER`: **postgres**
 - `USERNAME`: **admin**
-- `PASSWORD`: **p4tron4tiv3**
+- `PASSWORD`: you can find current password in `application.yml` file
 - `DATABASE` **patronative**
+
+To manage database from `IDE` IntelliJ Community Edition, you have to:
+1) Activate DB Browser:
+
+- navigate in the `File -> Settings -> Plugins` and type `"Database"`
+- Choose and install the `Database Navigator`
+- Restart the `IDE`
+- Select `View -> Tool windows -> DB Browser`
+
+2) Create new connection:
+
+- click `+`in the top left corner of DB Browser.
+- Select `PostgreSQL`
+- Now you can see new window with default database settings.
+- Provide database credentials from `application.yml` file and click `TEST CONNECTION`button.
+- If the test passed, click `Apply` and `OK`, if not, please report it to developers.
+
+3) Now you can get through the database and see`CONSOLES` `SCHEMAS` `USERS`etc.
 
 ## Status
 This project is still under development.
