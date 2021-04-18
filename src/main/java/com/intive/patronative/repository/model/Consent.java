@@ -30,6 +30,9 @@ public class Consent {
     @Setter(AccessLevel.NONE)
     private BigDecimal id;
 
+    @Column(name = "consent_id", nullable = false)
+    private BigDecimal consentId;
+
     @Column(name = "text", length = 256, nullable = false)
     private String text;
 

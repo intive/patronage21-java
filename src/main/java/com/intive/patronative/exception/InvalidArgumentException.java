@@ -17,4 +17,9 @@ public class InvalidArgumentException extends RuntimeException {
     public InvalidArgumentException(final String fieldName, final String fieldValue) {
         this.fieldErrors = Collections.singletonList(new FieldError("String", fieldName, fieldValue, false, null, null, DEFAULT_MESSAGE));
     }
+
+    public static InvalidArgumentException valueDoesNotExists(final String fieldName, final String rejectedValue) {
+        final var message = "Value not exists.";
+        return new InvalidArgumentException(Collections.singletonList(new FieldError("String", fieldName, rejectedValue, false, null, null, message)));
+    }
 }

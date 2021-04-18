@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 
+import java.util.Optional;
+
 @Repository
 public interface StatusRepository extends JpaRepository<Status, BigDecimal> {
+
+    Optional<Status> findByName(String name);
 }

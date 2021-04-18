@@ -1,0 +1,1 @@
+ALTER TABLE patronative.user DROP COLUMN user_name;

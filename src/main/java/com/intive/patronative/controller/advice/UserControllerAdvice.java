@@ -1,5 +1,6 @@
 package com.intive.patronative.controller.advice;
 
+import com.intive.patronative.exception.AlreadyExistsException;
 import com.intive.patronative.exception.InvalidArgumentException;
 import com.intive.patronative.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,13 @@ public class UserControllerAdvice {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(InvalidArgumentException.class)
     public ValidationErrorResponse invalidArgumentHandler(final InvalidArgumentException exception) {
+        return buildErrorResponse(exception.getFieldErrors());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ValidationErrorResponse alreadyExistException(final AlreadyExistsException exception) {
         return buildErrorResponse(exception.getFieldErrors());
     }
 

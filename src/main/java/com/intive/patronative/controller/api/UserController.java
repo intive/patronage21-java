@@ -2,10 +2,10 @@ package com.intive.patronative.controller.api;
 
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserResponseDTO;
-import com.intive.patronative.dto.model.UserDTO;
+import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
+import com.intive.patronative.dto.registration.UserRegistrationResponseDTO;
 import com.intive.patronative.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 
-import javax.validation.Valid;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,9 +31,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<String> saveUser(@Valid @RequestBody final UserDTO userDTO) {
-        userService.saveUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User saved");
+    public ResponseEntity<UserRegistrationResponseDTO> saveUser(
+            @RequestBody final UserRegistrationRequestDTO userRegistrationRequestDTO) {
+        final var response = userService.saveUser(userRegistrationRequestDTO);
+        return ResponseEntity.status(CREATED).body(response);
     }
 
     @PutMapping
