@@ -2,7 +2,8 @@ package com.intive.patronative.controller.api;
 
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserResponseDTO;
-import com.intive.patronative.dto.model.UserDTO;
+import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
+import com.intive.patronative.dto.registration.UserRegistrationResponseDTO;
 import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.profile.UserRole;
 import com.intive.patronative.dto.profile.UserStatus;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/api/users")
@@ -63,12 +64,13 @@ public class UserController {
     @PostMapping
     @Operation(summary = "Create user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Creation successful"),
+            @ApiResponse(responseCode = "201", description = "Creation successful"),
             @ApiResponse(responseCode = "400", description = "Invalid data passed"),
     })
-    public ResponseEntity<String> saveUser(@Valid @RequestBody final UserDTO userDTO) {
-        userService.saveUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User saved");
+    public ResponseEntity<UserRegistrationResponseDTO> saveUser(
+            @RequestBody final UserRegistrationRequestDTO userRegistrationRequestDTO) {
+        final var response = userService.saveUser(userRegistrationRequestDTO);
+        return ResponseEntity.status(CREATED).body(response);
     }
 
     @PutMapping

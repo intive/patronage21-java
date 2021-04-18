@@ -1,6 +1,7 @@
 package com.intive.patronative.controller.advice;
 
 import com.intive.patronative.exception.EntityNotFoundException;
+import com.intive.patronative.exception.AlreadyExistsException;
 import com.intive.patronative.exception.InvalidArgumentException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,6 +46,13 @@ public class UserControllerAdvice {
     @ExceptionHandler(InvalidArgumentException.class)
     public ValidationErrorResponse invalidArgumentHandler(final InvalidArgumentException exception) {
         return buildErrorResponse(exception.getFieldErrors());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ValidationErrorResponse alreadyExistException(final AlreadyExistsException exception) {
+        return buildErrorResponse(Collections.singletonList(exception.getFieldError()));
     }
 
     @ResponseBody

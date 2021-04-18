@@ -47,3 +47,6 @@ validators:
         max: 39
     projects:
       maximum-participation: 5
+    technology-groups:
+      minimum-participation: 1
+      maximum-participation: 3

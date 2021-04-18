@@ -1,11 +1,16 @@
 package com.intive.patronative.mapper;
 
 import com.intive.patronative.dto.UserEditDTO;
+import com.intive.patronative.dto.UserProfileDTO;
 import com.intive.patronative.dto.model.UserDTO;
 import com.intive.patronative.dto.model.UsersDTO;
+import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
+import com.intive.patronative.dto.registration.UserRegistrationResponseDTO;
+import com.intive.patronative.repository.model.Gender;
 import com.intive.patronative.dto.UserProfileDTO;
 import com.intive.patronative.repository.model.Profile;
 import com.intive.patronative.repository.model.Project;
+import com.intive.patronative.repository.model.Role;
 import com.intive.patronative.repository.model.Status;
 import com.intive.patronative.repository.model.User;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,7 @@ import java.util.stream.Collectors;
 public class UserMapper extends Mapper {
 
     private final ProjectMapper projectMapper;
+    private final GroupMapper groupMapper;
 
     public User mapToEntity(final UserEditDTO userEditDTO, final User user, final Set<Project> availableProjects) {
         if (userEditDTO != null && user != null) {
@@ -72,6 +78,35 @@ public class UserMapper extends Mapper {
                 .map(u -> new UsersDTO(u.stream()
                         .map(this::mapEntityToUserResponse)
                         .collect(Collectors.toList())))
+                .orElse(null);
+    }
+
+    public User toUserRegistrationEntity(final User userEntity, final UserRegistrationRequestDTO requestUser) {
+        if (userEntity != null && requestUser != null) {
+            userEntity.setEmail(requestUser.getEmail());
+            userEntity.setLogin(requestUser.getLogin());
+            userEntity.setFirstName(requestUser.getFirstName());
+            userEntity.setLastName(requestUser.getLastName());
+            userEntity.setPhoneNumber(requestUser.getPhoneNumber());
+            userEntity.setGitHubUrl(requestUser.getGitHubUrl());
+        }
+        return userEntity;
+    }
+
+    public UserRegistrationResponseDTO toUserRegistrationResponse(final User userEntity) {
+        return Optional.ofNullable(userEntity)
+                .map(user -> UserRegistrationResponseDTO.builder()
+                        .email(user.getEmail())
+                        .login(user.getLogin())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .phoneNumber(user.getPhoneNumber())
+                        .gitHubUrl(user.getGitHubUrl())
+                        .status(Optional.ofNullable(user.getStatus()).map(Status::getName).orElse(null))
+                        .gender(Optional.ofNullable(user.getGender()).map(Gender::getName).orElse(null))
+                        .role(Optional.ofNullable(user.getRole()).map(Role::getName).orElse(null))
+                        .groups(groupMapper.toResponseList(user.getTechnologyGroups()))
+                        .build())
                 .orElse(null);
     }
 }
