@@ -3,6 +3,7 @@ package com.intive.patronative.controller.frontend;
 import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.profile.User;
+import com.intive.patronative.dto.profile.UserRole;
 import com.intive.patronative.exception.InvalidArgumentException;
 import com.intive.patronative.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,9 @@ public class UserFrontController {
     @GetMapping
     public ResponseEntity<UsersDTO> search(@RequestParam(required = false) final String firstName,
                                            @RequestParam(required = false) final String lastName,
-                                           @RequestParam(required = false) final String username) throws InvalidArgumentException {
-        return ResponseEntity.ok(userService.searchUser(new UserSearchDTO(firstName, lastName, username)));
+                                           @RequestParam(required = false) final String username,
+                                           @RequestParam(required = false) final UserRole role) throws InvalidArgumentException {
+        return ResponseEntity.ok(userService.searchUser(new UserSearchDTO(firstName, lastName, username, role)));
     }
 
     @PutMapping
