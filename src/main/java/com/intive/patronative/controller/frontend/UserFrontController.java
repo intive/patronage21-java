@@ -1,8 +1,8 @@
 package com.intive.patronative.controller.frontend;
 
+import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.dto.model.UsersDTO;
-import com.intive.patronative.dto.profile.User;
 import com.intive.patronative.dto.profile.UserRole;
 import com.intive.patronative.exception.InvalidArgumentException;
 import com.intive.patronative.service.UserService;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/frontend-api/users")
@@ -33,8 +31,9 @@ public class UserFrontController {
     }
 
     @PutMapping
-    public void updateUser(@Valid @RequestBody final User user) {
-        userService.update(user);
+    public ResponseEntity<Void> update(@RequestBody final UserEditDTO userEditDTO) {
+        userService.updateUser(userEditDTO);
+        return ResponseEntity.ok().build();
     }
 
 }
