@@ -46,20 +46,25 @@ cd patronage21-java
 ````
 git checkout branch_name
 ````
-4) Starts the docker container with PostgreSQL image in the background:
-
+4) Run environment containing almost complete set of the application's elements:
 ````
 docker-compose up -d
 ````
-
-5) Build the project with Gradle.\
-   Run command prompt, go to the project's root directory (patronage21-java) and type:
-
+5) Create application's image:
+````
+docker build -t patronative_app .
+````
+6) Build the project with Gradle.\
+Run command prompt, go to the project's root directory (patronage21-java) and type:
 ````
 gradlew build
 ````
 If the build went successful, you will see "BUILD SUCCESSFUL" after the project finishes building. Otherwise, report the problem to developers.
 ## Setup
+Before running application on your own make sure the application started by docker-compose is not running:
+````
+docker stop patronative_app
+````
 To run this project, run command prompt, go to the project's root directory (patronage21-java), and type the following command:
 ````
 gradlew bootRun

@@ -11,5 +11,15 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: p4tron4tiv3
       POSTGRES_DB: patronative
+  app:
+    container_name: patronative_app
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - "postgres"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patronative_db:5432/patronative
 volumes:
   pgdata:
