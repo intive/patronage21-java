@@ -32,9 +32,9 @@ public class UserService {
         userSearchValidator.validateSearchParameters(userSearchDTO);
 
         return UsersDTO.builder()
-                .users(Arrays.asList(new UserDTO("someLogin", "Lucas", "Smith", "lsmith", "lsmith@gmail.com", "123456789", "lsmith"),
-                        new UserDTO("someLogin1", "Mark", "Marcuson", "mmarcuson", "marcuson@gmail.com", "98765421", "marcuson"),
-                        new UserDTO("someLogin2", "Dick", "Hunt", "hdick", "hdick@gmail.com", "654987321", "hdick")))
+                .users(Arrays.asList(new UserDTO("someLogin", "Lucas", "Smith", "lsmith@gmail.com", "123456789", "https://github.com/lsmith", "lsmith"),
+                        new UserDTO("someLogin1", "Mark", "Marcuson", "marcuson@gmail.com", "98765421", "https://github.com/marcuson", "mmarcuson"),
+                        new UserDTO("someLogin2", "Dick", "Hunt", "hdick@gmail.com", "654987321", "https://github.com/hdick", "hdick")))
                 .build();
     }
 
