@@ -1,18 +1,14 @@
 package com.intive.patronative.dto.model;
 
 import lombok.Value;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import org.springframework.lang.Nullable;
 
 @Value
 public class UserDTO {
-    @NotBlank(message = "Can not be empty") String login;
-    @NotBlank(message = "Can not be empty") String firstName;
-    @NotBlank(message = "Can not be empty") String lastName;
-    @Email(message = "Must be correct email address")
-    @NotBlank(message = "Can not be empty") String email;
-    @NotBlank(message = "Can not be empty") String phoneNumber;
-    @NotBlank(message = "Can not be empty") String gitHubUrl;
-    @NotBlank(message = "Can not be empty") String userName;
+    @Nullable String login;
+    @Nullable String firstName;
+    @Nullable String lastName;
+    @Nullable String email;
+    @Nullable String phoneNumber;
+    @Nullable String gitHubUrl;
 }

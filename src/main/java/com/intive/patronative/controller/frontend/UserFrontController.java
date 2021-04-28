@@ -2,10 +2,8 @@ package com.intive.patronative.controller.frontend;
 
 import com.intive.patronative.dto.UserResponseDTO;
 import com.intive.patronative.dto.UserEditDTO;
-import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.profile.UserRole;
-import com.intive.patronative.exception.InvalidArgumentException;
 import com.intive.patronative.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +25,9 @@ public class UserFrontController {
     @GetMapping
     public ResponseEntity<UsersDTO> search(@RequestParam(required = false) final String firstName,
                                            @RequestParam(required = false) final String lastName,
-                                           @RequestParam(required = false) final String username,
-                                           @RequestParam(required = false) final UserRole role) throws InvalidArgumentException {
-        return ResponseEntity.ok(userService.searchUser(new UserSearchDTO(firstName, lastName, username, role)));
+                                           @RequestParam(required = false) final String login,
+                                           @RequestParam(required = false) final UserRole role) {
+        return ResponseEntity.ok(userService.searchUsers(firstName, lastName, login, role));
     }
 
     @GetMapping("/{login}")

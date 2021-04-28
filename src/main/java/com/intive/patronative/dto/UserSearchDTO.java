@@ -11,7 +11,7 @@ public class UserSearchDTO {
     @Nullable
     String lastName;
     @Nullable
-    String username;
+    String login;
     @Nullable
     UserRole role;
 }

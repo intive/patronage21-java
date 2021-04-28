@@ -47,10 +47,10 @@ public class UserSearchValidator {
                 Optional.empty();
     }
 
-    private Optional<FieldError> checkUsername(final String username) {
-        final var usernameMessage = "Letters or numbers, minimum " + userSearchDataMinLength + " letters";
-        return (username != null) && (!UserValidator.isUsernameValid(username) || isLengthInvalid(username)) ?
-                Optional.of(new FieldError("String", "username", username, false, null, null, usernameMessage)) :
+    private Optional<FieldError> checkLogin(final String login) {
+        final var loginMessage = "Letters or numbers, minimum " + userSearchDataMinLength + " letters";
+        return (login != null) && (!UserValidator.isLoginValid(login) || isLengthInvalid(login)) ?
+                Optional.of(new FieldError("String", "login", login, false, null, null, loginMessage)) :
                 Optional.empty();
     }
 
@@ -58,7 +58,7 @@ public class UserSearchValidator {
         if (userSearchDTO != null) {
             return Stream.of(checkFirstName(userSearchDTO.getFirstName()),
                     checkLastName(userSearchDTO.getLastName()),
-                    checkUsername(userSearchDTO.getUsername()))
+                    checkLogin(userSearchDTO.getLogin()))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());

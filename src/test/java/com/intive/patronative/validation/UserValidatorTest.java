@@ -50,15 +50,15 @@ class UserValidatorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("validUsernames")
-    void isUsernameValid_shouldReturnTrue(final String username) {
-        assertTrue(UserValidator.isUsernameValid(username));
+    @MethodSource("validLogins")
+    void isLoginValid_shouldReturnTrue(final String login) {
+        assertTrue(UserValidator.isLoginValid(login));
     }
 
     @ParameterizedTest
-    @MethodSource("invalidUsernames")
-    void isUsernameValid_shouldReturnFalse(final String username) {
-        assertFalse(UserValidator.isUsernameValid(username));
+    @MethodSource("invalidLogins")
+    void isLoginValid_shouldReturnFalse(final String username) {
+        assertFalse(UserValidator.isLoginValid(username));
     }
 
     @ParameterizedTest
@@ -127,11 +127,11 @@ class UserValidatorTest {
                 " Gąsienica", "Gąsi$r", "markowsk@", "Curu1", "Cu- ru", "");
     }
 
-    private static Stream<String> validUsernames() {
+    private static Stream<String> validLogins() {
         return Stream.of("lucas", "lucas123", "123lucas", "luc123as", "Lucas", "nameSurname");
     }
 
-    private static Stream<String> invalidUsernames() {
+    private static Stream<String> invalidLogins() {
         return Stream.of(null, "Luca-", "Hi Mark", "123-patrick", "Bob*the*builder", "-masha", "the+Bear");
     }
 

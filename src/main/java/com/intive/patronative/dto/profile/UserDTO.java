@@ -3,7 +3,7 @@ package com.intive.patronative.dto.profile;
 import lombok.Data;
 
 @Data
-public class User {
+public class UserDTO {
 
     private String userName;
     private String firstName;

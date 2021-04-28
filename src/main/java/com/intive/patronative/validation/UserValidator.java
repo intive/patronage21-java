@@ -19,7 +19,7 @@ public class UserValidator {
     private static final String BASE_GITHUB_LINK = "https://github.com/";
     private static final Pattern FIRST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{2,64}$");
     private static final Pattern LAST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{2,31}[- ]?[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{2,31}$");
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9]{2,32}$");
+    private static final Pattern LOGIN_PATTERN = Pattern.compile("^[a-zA-Z0-9]{2,32}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9.]{4,45}+[@][a-zA-Z]{2,10}[.][a-z]{2,5}$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,16}$");
     private static final Pattern GITHUB_PATTERN = Pattern.compile("^" + BASE_GITHUB_LINK + "[a-zA-Z0-9]+([-?][a-zA-Z0-9]+)*$");
@@ -48,8 +48,8 @@ public class UserValidator {
         return (lastName != null) && LAST_NAME_PATTERN.matcher(lastName).matches();
     }
 
-    public static boolean isUsernameValid(final String username) {
-        return (username != null) && USERNAME_PATTERN.matcher(username).matches();
+    public static boolean isLoginValid(final String login) {
+        return (login != null) && LOGIN_PATTERN.matcher(login).matches();
     }
 
     public static boolean isEmailValid(final String email) {

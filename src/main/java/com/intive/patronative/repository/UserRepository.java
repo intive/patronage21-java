@@ -8,6 +8,6 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, BigDecimal> {
+public interface UserRepository extends JpaRepository<User, BigDecimal>, UserSearchRepository {
     Optional<User> findByLogin(String login);
 }
