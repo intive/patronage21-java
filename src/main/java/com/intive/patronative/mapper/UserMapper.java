@@ -1,6 +1,8 @@
 package com.intive.patronative.mapper;
 
 import com.intive.patronative.dto.UserEditDTO;
+import com.intive.patronative.dto.model.UserDTO;
+import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.UserProfileDTO;
 import com.intive.patronative.repository.model.Profile;
 import com.intive.patronative.repository.model.Project;
@@ -8,8 +10,10 @@ import com.intive.patronative.repository.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -49,4 +53,27 @@ public class UserMapper extends Mapper {
                 .orElse(null);
     }
 
+    public UserDTO mapEntityToUserResponse(final User user) {
+        if (user == null) {
+            return null;
+        }
+        return new UserDTO(
+                user.getLogin(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getGitHubUrl()
+        );
+    }
+
+    public UsersDTO mapEntitiesToUsersResponse(final List<User> users) {
+        if (users == null) {
+            return null;
+        }
+        final var usersDTO = users.stream()
+                .map(this::mapEntityToUserResponse)
+                .collect(Collectors.toList());
+        return new UsersDTO(usersDTO);
+    }
 }
