@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Collections;
 
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,27 +48,34 @@ class UserFrontControllerTest {
 
     @Test
     void usersFound_shouldReturnListAndStatus200() throws Exception {
-        when(userService.searchUsers(any(), any(), any(), any()))
+        // given
+        when(userService.searchUsers(any(), any(), any(), any(), any(), any()))
                 .thenReturn(users);
 
-        mvc.perform(get("/frontend-api/users"))
+        // when
+        final var action = mvc.perform(get("/frontend-api/users"));
+
+        // then
+        action
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(objectMapper.writeValueAsString(users)));
-
-        verify(userService, times(1)).searchUsers(any(), any(), any(), any());
+        verify(userService).searchUsers(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void usersNotFound_shouldReturnEmptyListAndStatus200() throws Exception {
+        // given
         final var emptyUsers = new UsersDTO(Collections.emptyList());
-
-        when(userService.searchUsers(any(), any(), any(), any()))
+        when(userService.searchUsers(any(), any(), any(), any(), any(), any()))
                 .thenReturn(emptyUsers);
 
-        mvc.perform(get("/frontend-api/users"))
+        // when
+        final var action = mvc.perform(get("/frontend-api/users"));
+
+        // then
+        action
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(objectMapper.writeValueAsString(emptyUsers)));
-
-        verify(userService, times(1)).searchUsers(any(), any(), any(), any());
+        verify(userService).searchUsers(any(), any(), any(), any(), any(), any());
     }
 }

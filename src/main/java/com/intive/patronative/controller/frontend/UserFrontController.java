@@ -34,8 +34,10 @@ public class UserFrontController {
     public ResponseEntity<UsersDTO> search(@RequestParam(required = false) final String firstName,
                                            @RequestParam(required = false) final String lastName,
                                            @RequestParam(required = false) final String login,
-                                           @RequestParam(required = false) final UserRole role) {
-        return ResponseEntity.ok(userService.searchUsers(firstName, lastName, login, role));
+                                           @RequestParam(required = false) final UserRole role,
+                                           @RequestParam(required = false) final String technologyGroup,
+                                           @RequestParam(required = false) final String other) {
+        return ResponseEntity.ok(userService.searchUsers(firstName, lastName, login, role, technologyGroup, other));
     }
 
     @GetMapping("/{login}")

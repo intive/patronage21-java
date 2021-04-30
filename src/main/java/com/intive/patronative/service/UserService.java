@@ -43,8 +43,9 @@ public class UserService {
                 projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR))));
     }
 
-    public UsersDTO searchUsers(final String firstName, final String lastName, final String login, final UserRole role) {
-        final var userSearchDTO = new UserSearchDTO(firstName, lastName, login, role);
+    public UsersDTO searchUsers(final String firstName, final String lastName, final String login, final UserRole role,
+                                final String technologyGroup, String other) {
+        final var userSearchDTO = new UserSearchDTO(firstName, lastName, login, role, technologyGroup, other);
         userSearchValidator.validateSearchParameters(userSearchDTO);
         final List<User> fetchedUsers = userRepository.findAllUsers(userSearchDTO);
 

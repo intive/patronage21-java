@@ -54,26 +54,21 @@ public class UserMapper extends Mapper {
     }
 
     public UserDTO mapEntityToUserResponse(final User user) {
-        if (user == null) {
-            return null;
-        }
-        return new UserDTO(
-                user.getLogin(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getGitHubUrl()
-        );
+        return Optional.ofNullable(user)
+                .map(u -> new UserDTO(u.getLogin(),
+                        u.getFirstName(),
+                        u.getLastName(),
+                        u.getEmail(),
+                        u.getPhoneNumber(),
+                        u.getGitHubUrl()))
+                .orElse(null);
     }
 
     public UsersDTO mapEntitiesToUsersResponse(final List<User> users) {
-        if (users == null) {
-            return null;
-        }
-        final var usersDTO = users.stream()
-                .map(this::mapEntityToUserResponse)
-                .collect(Collectors.toList());
-        return new UsersDTO(usersDTO);
+        return Optional.ofNullable(users)
+                .map(u -> new UsersDTO(u.stream()
+                        .map(this::mapEntityToUserResponse)
+                        .collect(Collectors.toList())))
+                .orElse(null);
     }
 }

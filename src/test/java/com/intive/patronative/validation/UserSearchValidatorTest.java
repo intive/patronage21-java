@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class UserSearchValidatorTest {
 
     private final int userSearchDataMinLength = 2;
-    private final UserSearchValidator userSearchValidator = new UserSearchValidator(userSearchDataMinLength);
+    private final int userSearchDataMaxLength = 125;
+    private final UserSearchValidator userSearchValidator = new UserSearchValidator(userSearchDataMinLength, userSearchDataMaxLength);
 
     @ParameterizedTest
     @MethodSource("validSearchData")
@@ -32,39 +33,52 @@ class UserSearchValidatorTest {
     private static Stream validSearchData() {
         return Stream.of(
                 null,
-                new UserSearchDTO(null, null, null, null),
-                new UserSearchDTO("Lucas", null, null, null),
-                new UserSearchDTO(null, "Smith", null, null),
-                new UserSearchDTO(null, null, "lSmith", null),
-                new UserSearchDTO(null, null, null, UserRole.CANDIDATE),
-                new UserSearchDTO("Lucas", "Smith", null, UserRole.LEADER),
-                new UserSearchDTO(null, "Smith", "lSmith", UserRole.LEADER),
-                new UserSearchDTO("Lucas", null, "lSmith", null),
-                new UserSearchDTO("Lucas", "Smith", "lSmith", UserRole.valueOf("CANDIDATE")),
-                new UserSearchDTO("łukasz", "śmith", "lukaszsmith", UserRole.valueOf("LEADER")),
-                new UserSearchDTO("Marta", "dwa-człony", "marta123", UserRole.valueOf("CANDIDATE")),
-                new UserSearchDTO("Marta", "dwa człony", "123marta", null),
-                new UserSearchDTO("Lucas", "Smith", "lSm123ith", UserRole.valueOf("LEADER"))
+                new UserSearchDTO(null, null, null, null, null, null),
+                new UserSearchDTO("Lucas", null, null, null, null, null),
+                new UserSearchDTO(null, "Smith", null, null, null, null),
+                new UserSearchDTO(null, null, "lSmith", null, null, null),
+                new UserSearchDTO(null, null, null, UserRole.CANDIDATE, null, null),
+                new UserSearchDTO(null, null, null, null, "Java", null),
+                new UserSearchDTO(null, null, null, null, null, "Lucas"),
+                new UserSearchDTO("Lucas", "Smith", null, UserRole.LEADER, null, null),
+                new UserSearchDTO(null, "Smith", "lSmith", UserRole.LEADER, null, null),
+                new UserSearchDTO("Lucas", null, "lSmith", null, null, null),
+                new UserSearchDTO("Lucas", null, "lSmith", null, "Java", null),
+                new UserSearchDTO("Lucas", null, "lSmith", null, null, "Lucas"),
+                new UserSearchDTO("Lucas", "Smith", "lSmith", UserRole.valueOf("CANDIDATE"), null, null),
+                new UserSearchDTO("łukasz", "śmith", "lukaszsmith", UserRole.valueOf("LEADER"), null, null),
+                new UserSearchDTO("Marta", "dwa-człony", "marta123", UserRole.valueOf("CANDIDATE"), null, null),
+                new UserSearchDTO("Marta", "dwa człony", "123marta", null, null, null),
+                new UserSearchDTO("Lucas", "Smith", "lSm123ith", UserRole.valueOf("LEADER"), null, null),
+                new UserSearchDTO(null, null, null, null, "Android (mobile)", null),
+                new UserSearchDTO(null, null, null, null, "Java Script", null),
+                new UserSearchDTO(null, null, null, null, "Java", null),
+                new UserSearchDTO(null, null, null, null, "Java5", null),
+                new UserSearchDTO(null, null, null, null, "amazon-web-services", null)
         );
     }
 
     private static Stream invalidSearchData() {
         return Stream.of(
-                new UserSearchDTO("Lucas123", null, null, null),
-                new UserSearchDTO(null, " Smith", null, UserRole.valueOf("LEADER")),
-                new UserSearchDTO(null, "Smith ", null, UserRole.valueOf("CANDIDATE")),
-                new UserSearchDTO(null, "Smith123", null, null),
-                new UserSearchDTO(null, "Smith-", null, null),
-                new UserSearchDTO(null, "-Smith", null, null),
-                new UserSearchDTO(null, null, "lSmith*", null),
-                new UserSearchDTO(null, null, "+123lSmith", null),
-                new UserSearchDTO(null, null, "+123 lSmith", null),
-                new UserSearchDTO(null, null, "+123-lSmith", null),
-                new UserSearchDTO(null, null, "l", null),
-                new UserSearchDTO(null, "l", null, null),
-                new UserSearchDTO("l", null, null, null),
-                new UserSearchDTO("l", "a", null, null),
-                new UserSearchDTO("l", "a", "s", null)
+                new UserSearchDTO("Lucas123", null, null, null, null, null),
+                new UserSearchDTO(null, " Smith", null, UserRole.valueOf("LEADER"), null, null),
+                new UserSearchDTO(null, "Smith ", null, UserRole.valueOf("CANDIDATE"), null, null),
+                new UserSearchDTO(null, "Smith123", null, null, null, null),
+                new UserSearchDTO(null, "Smith-", null, null, null, null),
+                new UserSearchDTO(null, "-Smith", null, null, null, null),
+                new UserSearchDTO(null, null, "lSmith*", null, null, null),
+                new UserSearchDTO(null, null, "+123lSmith", null, null, null),
+                new UserSearchDTO(null, null, "+123 lSmith", null, null, null),
+                new UserSearchDTO(null, null, "+123-lSmith", null, null, null),
+                new UserSearchDTO(null, null, "l", null, null, null),
+                new UserSearchDTO(null, "l", null, null, null, null),
+                new UserSearchDTO("l", null, null, null, null, null),
+                new UserSearchDTO("l", "a", null, null, null, null),
+                new UserSearchDTO("l", "a", "s", null, null, null),
+                new UserSearchDTO(null, null, null, null, "Java&", null),
+                new UserSearchDTO(null, null, null, null, "J", null),
+                new UserSearchDTO(null, null, null, null, "", null),
+                new UserSearchDTO(null, null, null, null, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In pharetra", null)
         );
     }
 

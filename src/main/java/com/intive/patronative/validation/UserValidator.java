@@ -35,6 +35,8 @@ public class UserValidator {
     private static final int MAX_EMAIL_USERNAME_LENGTH = 30;
     private static final int MIN_GITHUB_USERNAME_LENGTH = 4;
     private static final int MAX_GITHUB_USERNAME_LENGTH = 39;
+    private static final int MIN_OTHER_LENGTH = 2;
+    private static final int MAX_OTHER_LENGTH = 125;
     private static final String BASE_GITHUB_LINK = "github.com/";
     private static final String FULL_GITHUB_LINK = "https://www.github.com/";
 
@@ -48,6 +50,9 @@ public class UserValidator {
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{" + PHONE_NUMBER_LENGTH + "}$");
     private static final Pattern GITHUB_PATTERN = Pattern.compile("^(https?://)?(www.)?" + BASE_GITHUB_LINK +
             "[a-zA-Z0-9](?:[a-zA-Z\\d]|-(?=[a-zA-Z\\d])){" + (MIN_GITHUB_USERNAME_LENGTH - 1) + "," + (MAX_GITHUB_USERNAME_LENGTH - 1) + "}$");
+    private static final Pattern OTHER_PATTERN = Pattern.compile(
+            "^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9 -]" + "{" + MIN_OTHER_LENGTH + "," + MAX_OTHER_LENGTH + "}$");
+    private static final Pattern TECHNOLOGY_GROUP_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9() -]+$");
 
     private static final String FIRST_NAME_MESSAGE = "Only letters, " + MIN_NAME_LENGTH + " to " + MAX_NAME_LENGTH + " letters";
     private static final String LAST_NAME_MESSAGE = "Only letters, dash or space allowed for two part surnames, each surname " +
@@ -96,6 +101,14 @@ public class UserValidator {
 
     public static boolean isBioValid(final String bio) {
         return (bio != null) && (bio.length() <= BIO_LENGTH);
+    }
+
+    public static boolean isOtherValid(final String other) {
+        return (other != null) && OTHER_PATTERN.matcher(other).matches();
+    }
+
+    public static boolean isTechnologyGroupValid(final String technologyGroup) {
+        return (technologyGroup != null) && TECHNOLOGY_GROUP_PATTERN.matcher(technologyGroup).matches();
     }
 
     private List<FieldError> getFieldErrors(final UserEditDTO userEditDTO) {
