@@ -37,5 +37,4 @@ public class UserService {
                         new UserDTO("someLogin2", "Dick", "Hunt", "hdick@gmail.com", "654987321", "https://github.com/hdick", "hdick")))
                 .build();
     }
-
 }

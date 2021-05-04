@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class PatronativeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PatronativeApplication.class, args);
-	}
+    public static void main(final String[] args) {
+        SpringApplication.run(PatronativeApplication.class, args);
+    }
 
 }
