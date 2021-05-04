@@ -1,4 +1,4 @@
-package com.intive.patronative.validation;
+package com.intive.patronative.controller.advice;
 
 import com.intive.patronative.exception.InvalidArgumentException;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class UserControllerValidationHandlerAdvice {
+public class UserControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
