@@ -12,8 +12,8 @@ public class OpenAPIConfig {
     public OpenAPI patronativeOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("Patronative API")
-                .description("Users module")
-                .version("v0.0.1"));
+                        .description("Users module")
+                        .version("v0.0.1"));
     }
 
 }

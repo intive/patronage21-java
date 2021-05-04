@@ -1,8 +1,8 @@
 package com.intive.patronative.controller.advice;
 
 import com.intive.patronative.exception.InvalidArgumentException;
-import org.springframework.http.HttpStatus;
 import lombok.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
