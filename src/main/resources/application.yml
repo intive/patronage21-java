@@ -4,6 +4,10 @@ spring:
     username: admin
     password: p4tron4tiv3
     driverClassName: org.postgresql.Driver
+  flyway:
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
   jpa:
     show-sql: true
     hibernate:
