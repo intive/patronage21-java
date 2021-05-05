@@ -1,5 +1,9 @@
 package com.intive.patronative.service;
 
+import com.intive.patronative.mapper.UserMapper;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,9 +17,7 @@ import com.intive.patronative.repository.model.Profile;
 import com.intive.patronative.repository.UserRepository;
 import com.intive.patronative.repository.ProjectRepository;
 import com.intive.patronative.validation.UserSearchValidator;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,16 +28,18 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(UserService.class)
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @MockBean
+    @Mock
     private UserRepository userRepository;
-    @MockBean
+    @Mock
     ProjectRepository projectRepository;
-    @MockBean
+    @Mock
     private UserSearchValidator userSearchValidator;
-    @Autowired
+    @Mock
+    UserMapper userMapper;
+    @InjectMocks
     private UserService userService;
 
     @ParameterizedTest
@@ -52,42 +56,72 @@ class UserServiceTest {
         Mockito.when(userRepository.findByLogin("login")).thenReturn(Optional.of(exampleUser()));
         Mockito.when(projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR))).thenReturn(projects);
         assertDoesNotThrow(() -> userService.updateUser(new UserEditDTO("login", null, null, null, null, null, null,
-                Collections.singleton(new ProjectDTO("exampleProjectName", "projectRole")))));
+                Collections.singleton(ProjectDTO.builder().name("exampleProjectName").role("projectRole").build()))));
     }
 
     @ParameterizedTest
     @MethodSource("validUserData")
     void updateUser_shouldThrowUserNotFoundException(final UserEditDTO userEditDTO) {
-        Mockito.when(userRepository.findByLogin(userEditDTO.getLogin())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.updateUser(userEditDTO));
     }
 
     @ParameterizedTest
     @MethodSource("invalidUserData")
     void updateUser_shouldThrowInvalidArgumentException(final UserEditDTO userEditDTO) {
-        Mockito.when(userRepository.findByLogin(userEditDTO.getLogin())).thenReturn(Optional.of(new User()));
         assertThrows(InvalidArgumentException.class, () -> userService.updateUser(userEditDTO));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validExistingLogin")
+    void getUser_shouldNotThrow(final String login) {
+        Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.of(exampleUser()));
+        assertDoesNotThrow(() -> userService.getUserByLogin(login));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validNonExistingLogin")
+    void getUser_shouldThrowUserNotFoundException(final String login) {
+        Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.getUserByLogin(login));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidLogin")
+    void getUser_shouldThrowInvalidArgumentException(final String login) {
+        assertThrows(InvalidArgumentException.class, () -> userService.getUserByLogin(login));
     }
 
     private static Stream<UserEditDTO> validUserData() {
         return Stream.of(
                 new UserEditDTO("login", "firstName", "lastName", "email@mail.pl", "123456789", "https://github.com/username",
-                        "bio", Collections.singleton(new ProjectDTO("exampleProjectName", "projectRole"))),
+                        "bio", Collections.singleton(ProjectDTO.builder().name("exampleProjectName").role("projectRole").build())),
                 new UserEditDTO("login", "firstName", "lastName", "email@mail.pl", "123456789", "https://github.com/username",
                         "bio", null),
                 new UserEditDTO("login", null, null, null, null, null, "bio", null),
                 new UserEditDTO("jKronoung", "Jacob", "Kronuung", "JackobK@mail.de", "987654321", "https://github.com/daJK",
-                        "bio", Collections.singleton(new ProjectDTO("projectName", "projectRole")))
+                        "bio", Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build()))
         );
     }
 
     private static Stream<UserEditDTO> invalidUserData() {
         return Stream.of(
                 new UserEditDTO("FnLn", "first-Name", "lastName", "email@mail.pl", "123456789", "https://github.com/username",
-                        "bio", Collections.singleton(new ProjectDTO("projectName", "projectRole"))),
+                        "bio", Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
                 new UserEditDTO("JacoKr", "Jaco Jr", "Kronon", "JacoKrono@mail.pl", "123 123 123", "https://github.com/JKda",
-                        "bio", Collections.singleton(new ProjectDTO("projectName", "projectRole")))
+                        "bio", Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build()))
         );
+    }
+
+    private static Stream<String> validExistingLogin() {
+        return Stream.of("AnnaNowak", "ValidLogin123");
+    }
+
+    private static Stream<String> validNonExistingLogin() {
+        return Stream.of("nonExistingLogin");
+    }
+
+    private static Stream<String> invalidLogin() {
+        return Stream.of(null, "l", "Luc-Skywalker", ".dot");
     }
 
     private User exampleUser() {

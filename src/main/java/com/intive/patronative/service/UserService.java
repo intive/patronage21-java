@@ -1,6 +1,7 @@
 package com.intive.patronative.service;
 
 import com.intive.patronative.dto.UserEditDTO;
+import com.intive.patronative.dto.UserResponseDTO;
 import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.dto.model.UserDTO;
 import com.intive.patronative.dto.model.UsersDTO;
@@ -24,6 +25,7 @@ import java.util.Calendar;
 public class UserService {
 
     private final UserSearchValidator userSearchValidator;
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
@@ -33,7 +35,7 @@ public class UserService {
     public void updateUser(final UserEditDTO userEditDTO) {
         new UserValidator().validateUserData(userEditDTO);
 
-        userRepository.save(UserMapper.mapToEntity(userEditDTO,
+        userRepository.save(userMapper.mapToEntity(userEditDTO,
                 userRepository.findByLogin(userEditDTO.getLogin()).orElseThrow(() -> new UserNotFoundException("login", userEditDTO.getLogin())),
                 projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR))));
     }
@@ -48,6 +50,15 @@ public class UserService {
                         new UserDTO("someLogin1", "Mark", "Marcuson", "marcuson@gmail.com", "98765421", "https://github.com/marcuson", "mmarcuson"),
                         new UserDTO("someLogin2", "Dick", "Hunt", "hdick@gmail.com", "654987321", "https://github.com/hdick", "hdick")))
                 .build();
+    }
+
+    public UserResponseDTO getUserByLogin(final String login) {
+        if (!UserValidator.isUsernameValid(login)) {
+            throw new InvalidArgumentException("login", login);
+        }
+
+        return new UserResponseDTO(userMapper.mapToUserProfileDTO(userRepository.findByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException("login", login))));
     }
 
 }

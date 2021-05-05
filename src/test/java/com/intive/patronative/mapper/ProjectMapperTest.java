@@ -16,22 +16,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectMapperTest {
 
+    private final ProjectMapper projectMapper = new ProjectMapper();
+
     @Test
     void toProjectSet_shouldReturnProjectSet() {
         final var projectsDTOList = exampleProjectsDTOSets();
         final var expectedResult = expectedResults();
         for (int i = 0; i < expectedResult.size(); i++) {
-            assertEquals(expectedResult.get(i), ProjectMapper.toProjectSet(projectsDTOList.get(i), exampleEntityProjectsSet()).orElseThrow());
+            assertEquals(expectedResult.get(i), projectMapper.mapToProjectSet(projectsDTOList.get(i), exampleEntityProjectsSet()).orElseThrow());
         }
     }
 
     @Test
     void toProjectSet_shouldReturnEmptyOptional() {
-        assertEquals(Optional.empty(), ProjectMapper.toProjectSet(null, null));
-        assertEquals(Optional.empty(), ProjectMapper.toProjectSet(null, Collections.emptySet()));
-        assertEquals(Optional.empty(), ProjectMapper.toProjectSet(null, exampleEntityProjectsSet()));
-        assertEquals(Optional.empty(), ProjectMapper.toProjectSet(exampleProjectsDTOSets().get(0), null));
-        assertEquals(Optional.empty(), ProjectMapper.toProjectSet(exampleProjectsDTOSets().get(0), Collections.emptySet()));
+        assertEquals(Optional.empty(), projectMapper.mapToProjectSet(null, null));
+        assertEquals(Optional.empty(), projectMapper.mapToProjectSet(null, Collections.emptySet()));
+        assertEquals(Optional.empty(), projectMapper.mapToProjectSet(null, exampleEntityProjectsSet()));
+        assertEquals(Optional.empty(), projectMapper.mapToProjectSet(exampleProjectsDTOSets().get(0), null));
+        assertEquals(Optional.empty(), projectMapper.mapToProjectSet(exampleProjectsDTOSets().get(0), Collections.emptySet()));
     }
 
     private List<Set<ProjectDTO>> exampleProjectsDTOSets() {
@@ -67,7 +69,7 @@ class ProjectMapperTest {
     }
 
     private ProjectDTO getProjectDTO(final String name) {
-        return new ProjectDTO(name, null);
+        return ProjectDTO.builder().name(name).role(null).build();
     }
 
     private Project getProject(final String name) {
