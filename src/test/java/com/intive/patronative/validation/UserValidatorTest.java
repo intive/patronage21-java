@@ -9,7 +9,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserValidatorTest {
 
@@ -125,7 +128,7 @@ class UserValidatorTest {
     }
 
     private static Stream<String> invalidLastNames() {
-        return Stream.of(null,"Zuke*rberg", "J+obs", "Gąsienica-", "-Gąsienica-", "-Gąsienica", "Gąsienica ", " Gąsienica ",
+        return Stream.of(null, "Zuke*rberg", "J+obs", "Gąsienica-", "-Gąsienica-", "-Gąsienica", "Gąsienica ", " Gąsienica ",
                 " Gąsienica", "Gąsi$r", "markowsk@", "Curu1", "Cu- ru", "");
     }
 
@@ -173,16 +176,16 @@ class UserValidatorTest {
         return Stream.of(
                 null,
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta lorem quis tristique tempus. Morbi sit amet dui nulla. Phasellus nec euismod diam. Curabitur at finibus orci. Mauris eu ultricies tortor. Ut vitae tempor nibh. Proin sit amet nunc condimentum, ultricies leo in, laoreet dolor. Maecenas ut erat sit amet lectus venenatis semper ac vel ante. Suspendisse eros felis, dapibus sed mauris a, scelerisque mollis turpis. Nullam vestibulum tellus nunc, vitae eleifend nisi porta non. Integer libero est, aliquam tempus nisi ut, porta mollis turpis. Nulla facilisi. Phasellus nec nisi erat. Quisque ac sodales quam, ut rhoncus neque. Donec euismod, orci vitae molestie finibus, tellus elit consectetur arcu, sed malesuada nisl nibh eget velit. Pellentesque laoreet pellentesque finibus.\n" +
-                "\n" +
-                "Etiam commodo a turpis ac pretium. Phasellus placerat sapien ante, ut rhoncus justo tempor sodales. Quisque ac fermentum felis. Donec ac varius nunc. Praesent quis vulputate neque. Nulla vestibulum viverra rutrum. Proin a quam placerat, commodo ante nec, placerat augue. Praesent sodales, tellus eu volutpat posuere, lorem eros ultricies mauris, et eleifend quam lacus eget erat. Duis velit augue, euismod id lacus at, molestie bibendum ex.\n" +
-                "\n" +
-                "Nunc quis rutrum orci, imperdiet ultricies risus. Sed accumsan magna semper erat convallis efficitur. Etiam rhoncus, tortor vitae fermentum convallis, sem lectus cursus sapien, accumsan lobortis tellus eros non nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Quisque tempus magna eget justo volutpat, ac placerat turpis hendrerit. Nam rhoncus dapibus auctor. Donec venenatis tristique erat tempor laoreet. Mauris at felis libero. Ut felis augue, tristique quis erat a, accumsan molestie risus. Suspendisse id elit quis diam sagittis consectetur sit amet vel elit. Etiam ut sollicitudin purus, a facilisis nulla. Integer vitae eros dui. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse potenti.\n" +
-                "\n" +
-                "Nullam tristique faucibus ligula. Nunc cursus arcu ac dolor efficitur fermentum. Nullam gravida luctus mi non porta. Maecenas vel neque metus. Nullam mollis, metus vitae cursus dapibus, nisi lorem tincidunt velit, non dignissim tortor lectus in felis. Sed vel urna eu odio bibendum viverra. Aliquam dictum scelerisque arcu. Praesent consequat, leo vitae porttitor aliquam, sem purus iaculis tellus, eu efficitur felis arcu id massa.\n" +
-                "\n" +
-                "Nunc pellentesque sem nibh. Praesent a erat eros. Vivamus eget est dignissim, efficitur ipsum ac, laoreet sapien. Mauris risus sapien, ultrices vel leo sed, mattis tempor est. Curabitur a eleifend mauris, a consequat urna. Suspendisse mattis aliquet libero et blandit. Vestibulum rhoncus felis lorem, et venenatis erat feugiat non. Integer quis eros malesuada erat dapibus lacinia. Donec imperdiet sapien a magna elementum gravida. Aliquam lobortis quam auctor ligula vestibulum convallis. Suspendisse id suscipit mi. Sed iaculis dui eget congue tincidunt. Nunc ut sagittis purus. Maecenas ac metus mauris.\n" +
-                "\n" +
-                "Vestibulum vel tincidunt tellus. Maecenas porttitor quis lorem eget consectetur. Mauris laoreet odio est, sed malesuada diam faucibus eget. Nulla sem mi, volutpat quis vehicula vel, rhoncus eget mauris. Vestibulum convallis consectetur orci et rhoncus. In et porta lacus, sed convallis nunc. Phasellus vel nunc pellentesque nibh porttitor accumsan sed quis turpis. Donec elementum interdum gravida. In odio quam, ultrices laoreet justo sed."
+                        "\n" +
+                        "Etiam commodo a turpis ac pretium. Phasellus placerat sapien ante, ut rhoncus justo tempor sodales. Quisque ac fermentum felis. Donec ac varius nunc. Praesent quis vulputate neque. Nulla vestibulum viverra rutrum. Proin a quam placerat, commodo ante nec, placerat augue. Praesent sodales, tellus eu volutpat posuere, lorem eros ultricies mauris, et eleifend quam lacus eget erat. Duis velit augue, euismod id lacus at, molestie bibendum ex.\n" +
+                        "\n" +
+                        "Nunc quis rutrum orci, imperdiet ultricies risus. Sed accumsan magna semper erat convallis efficitur. Etiam rhoncus, tortor vitae fermentum convallis, sem lectus cursus sapien, accumsan lobortis tellus eros non nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Quisque tempus magna eget justo volutpat, ac placerat turpis hendrerit. Nam rhoncus dapibus auctor. Donec venenatis tristique erat tempor laoreet. Mauris at felis libero. Ut felis augue, tristique quis erat a, accumsan molestie risus. Suspendisse id elit quis diam sagittis consectetur sit amet vel elit. Etiam ut sollicitudin purus, a facilisis nulla. Integer vitae eros dui. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse potenti.\n" +
+                        "\n" +
+                        "Nullam tristique faucibus ligula. Nunc cursus arcu ac dolor efficitur fermentum. Nullam gravida luctus mi non porta. Maecenas vel neque metus. Nullam mollis, metus vitae cursus dapibus, nisi lorem tincidunt velit, non dignissim tortor lectus in felis. Sed vel urna eu odio bibendum viverra. Aliquam dictum scelerisque arcu. Praesent consequat, leo vitae porttitor aliquam, sem purus iaculis tellus, eu efficitur felis arcu id massa.\n" +
+                        "\n" +
+                        "Nunc pellentesque sem nibh. Praesent a erat eros. Vivamus eget est dignissim, efficitur ipsum ac, laoreet sapien. Mauris risus sapien, ultrices vel leo sed, mattis tempor est. Curabitur a eleifend mauris, a consequat urna. Suspendisse mattis aliquet libero et blandit. Vestibulum rhoncus felis lorem, et venenatis erat feugiat non. Integer quis eros malesuada erat dapibus lacinia. Donec imperdiet sapien a magna elementum gravida. Aliquam lobortis quam auctor ligula vestibulum convallis. Suspendisse id suscipit mi. Sed iaculis dui eget congue tincidunt. Nunc ut sagittis purus. Maecenas ac metus mauris.\n" +
+                        "\n" +
+                        "Vestibulum vel tincidunt tellus. Maecenas porttitor quis lorem eget consectetur. Mauris laoreet odio est, sed malesuada diam faucibus eget. Nulla sem mi, volutpat quis vehicula vel, rhoncus eget mauris. Vestibulum convallis consectetur orci et rhoncus. In et porta lacus, sed convallis nunc. Phasellus vel nunc pellentesque nibh porttitor accumsan sed quis turpis. Donec elementum interdum gravida. In odio quam, ultrices laoreet justo sed."
         );
     }
 

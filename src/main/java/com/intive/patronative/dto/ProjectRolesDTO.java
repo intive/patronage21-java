@@ -5,6 +5,6 @@ import lombok.Value;
 import java.util.Set;
 
 @Value
-public class ProjectsResponseDTO {
-    Set<ProjectResponseDTO> projects;
+public class ProjectRolesDTO {
+    Set<String> roles;
 }
