@@ -1,6 +1,7 @@
 package com.intive.patronative.mapper;
 
 import com.intive.patronative.dto.ProjectDTO;
+import com.intive.patronative.dto.ProjectResponseDTO;
 import com.intive.patronative.repository.model.Project;
 import com.intive.patronative.repository.model.ProjectRole;
 import org.springframework.stereotype.Component;
@@ -56,6 +57,14 @@ public class ProjectMapper {
 
     private static Optional<Project> getEquallyNamedProject(final String dtoProjectName, final Project entityProject) {
         return Optional.of(entityProject).filter(project -> project.getName().equals(dtoProjectName));
+    }
+
+    public Set<ProjectResponseDTO> mapToProjectResponsesDTO(final Set<Project> projects) {
+        return Optional.ofNullable(projects)
+                .map(p -> p.stream()
+                        .map(project -> new ProjectResponseDTO(project.getId(), project.getName()))
+                        .collect(Collectors.toSet()))
+                .orElse(Set.of());
     }
 
 }

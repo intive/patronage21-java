@@ -1,9 +1,9 @@
 package com.intive.patronative.mapper;
 
 import com.intive.patronative.dto.UserEditDTO;
+import com.intive.patronative.dto.UserProfileDTO;
 import com.intive.patronative.repository.model.Project;
 import com.intive.patronative.repository.model.User;
-import com.intive.patronative.dto.UserProfileDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class UserMapper extends Mapper{
+public class UserMapper extends Mapper {
 
     private final ProjectMapper projectMapper;
 
