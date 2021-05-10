@@ -1,5 +1,6 @@
 package com.intive.patronative.service;
 
+import com.intive.patronative.repository.StatusRepository;
 import com.intive.patronative.mapper.UserMapper;
 import com.intive.patronative.validation.UserValidator;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +37,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     ProjectRepository projectRepository;
+    @Mock
+    private StatusRepository statusRepository;
     @Mock
     private UserSearchValidator userSearchValidator;
     @Mock
@@ -76,14 +79,14 @@ class UserServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("validExistingLogin")
+    @MethodSource("validLogin")
     void getUser_shouldNotThrow(final String login) {
         Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.of(exampleUser()));
         assertDoesNotThrow(() -> userService.getUserByLogin(login));
     }
 
     @ParameterizedTest
-    @MethodSource("validNonExistingLogin")
+    @MethodSource("validLogin")
     void getUser_shouldThrowUserNotFoundException(final String login) {
         Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.getUserByLogin(login));
@@ -93,6 +96,26 @@ class UserServiceTest {
     @MethodSource("invalidLogin")
     void getUser_shouldThrowInvalidArgumentException(final String login) {
         assertThrows(InvalidArgumentException.class, () -> userService.getUserByLogin(login));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validLogin")
+    void deactivateUser_shouldNotThrow(final String login) {
+        Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.of(new User()));
+        assertDoesNotThrow(() -> userService.deactivateUserByLogin(login));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validLogin")
+    void deactivateUser_shouldThrowUserNotFoundException(final String login) {
+        Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.deactivateUserByLogin(login));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidLogin")
+    void deactivateUser_shouldInvalidArgumentException(final String login) {
+        assertThrows(InvalidArgumentException.class, () -> userService.deactivateUserByLogin(login));
     }
 
     private static Stream<UserEditDTO> validUserData() {
@@ -116,16 +139,12 @@ class UserServiceTest {
         );
     }
 
-    private static Stream<String> validExistingLogin() {
-        return Stream.of("AnnaNowak", "ValidLogin123");
-    }
-
-    private static Stream<String> validNonExistingLogin() {
-        return Stream.of("nonExisting");
-    }
-
     private static Stream<String> invalidLogin() {
         return Stream.of(null, "l", "Luc-Skywalker", ".dot");
+    }
+
+    private static Stream<String> validLogin() {
+        return Stream.of("AnnaNowak", "ValidLogin123");
     }
 
     private User exampleUser() {
@@ -145,7 +164,6 @@ class UserServiceTest {
     private static Project exampleProject() {
         final var project = new Project();
         project.setName("exampleProjectName");
-
         return project;
     }
 
