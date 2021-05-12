@@ -8,11 +8,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenAPIConfig {
 
+    private final static String TITLE = "Patronative's user module API";
+    private static final String DESCRIPTION = "Its purpose is to provide a set of basic operations such as " +
+            "retrieving, saving, and updating user-focused data.";
+
     @Bean
     public OpenAPI patronativeOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("Patronative API")
-                        .description("Users module")
+                .info(new Info()
+                        .title(TITLE)
+                        .description(DESCRIPTION)
                         .version("v0.0.1"));
     }
 
