@@ -109,14 +109,19 @@ or:
 4) Click "Send" and you will see a response from the API below.
 
 #### Docker
+1) Make sure there is no volume left behind:
 
-1) Run container in detached mode, by call:
+````output
+docker volume rm patronage21-java_pgdata
+````
+
+2) Run container in detached mode, by call:
 
 ```output
 docker-compose up -d
 ```
 
-2) Check, if container was created correctly.
+3) Check, if container was created correctly.
 
 To list containers related to images declared in `docker-compose file` call:
 
@@ -181,7 +186,7 @@ docker container stop patronative_db
 Stop and remove all containers created by `docker-compose up`:
 
 ```output
-docker-compose down
+docker-compose down --volumes
 ```
 
 4) Remove the container:

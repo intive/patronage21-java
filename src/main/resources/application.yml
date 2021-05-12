@@ -4,6 +4,9 @@ spring:
     username: admin
     password: p4tron4tiv3
     driverClassName: org.postgresql.Driver
+    initialize: true
+    initialization-mode: always
+    schema: classpath:/db.sql
   jpa:
     show-sql: true
     hibernate:
