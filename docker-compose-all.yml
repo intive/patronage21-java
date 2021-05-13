@@ -1,0 +1,45 @@
+version: '3.9'
+services:
+  frontend:
+    container_name: frontend_app
+    build:
+      context: ../patronage21-java-frontend/
+    ports:
+      - 80:80
+
+  backend:
+    container_name: patronative_app
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - "postgres"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patronative_db:5432/patronative
+
+  postgres:
+    image: postgres:latest
+    container_name: patronative_db
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: p4tron4tiv3
+      POSTGRES_DB: patronative
+
+  revproxy:
+    image: nginx:latest
+    container_name: revproxy
+    ports:
+      - "9080:80"
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./src/main/resources:/usr/share/nginx/html
+
+volumes:
+  pgdata:

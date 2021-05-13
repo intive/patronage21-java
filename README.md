@@ -224,5 +224,53 @@ To manage database from `IDE` IntelliJ Community Edition, you have to:
 
 3) Now you can get through the database and see`CONSOLES` `SCHEMAS` `USERS`etc.
 
+---
+
+## How to run entire application
+
+In order to start on your local machine entire module, you have to download from CVS all its building components:
+
+- patronage21-java
+- patronage21-java-frontend.
+
+From `patronage21-java` directory, run dedicated docker-compose file: `docker-compose-all.yml`. In contains all
+information necessary to build, configure and start all module components.
+
+In order to run docker-compose with aforementioned file, you have to run in your shell presented below command:
+
+```
+docker-compose -f docker-compose-all.yml up -d
+```
+
+The parameter `-d` will run docker-compose in detached mode, so you will be able to you your console.
+
+To stop entire module, please run:
+
+```
+docker-compose -f docker-compose-all.yml down
+```
+
+Aforementioned file is reponsible for starting all module building block, such as:
+
+- **Revers proxy** (NginX based); accepts connections on port: 9080
+- **Frontend module** (Nginx based);
+  <span style="color:red; font-style:italic">currently it accepts connections on port: **80**, but after revers proxy
+  configuration it shouldn't be accessible directly</span>
+- **Backend module** (Apache Tomcat from SpringBoot);
+  <span style="color:red; font-style:italic">currently it accepts connections on port: **8080**, but after revers proxy
+  configuration it shouldn't be accessible directly</span>
+- **Database** (PostgreSQL);
+  <span style="color:red; font-style:italic">currently it accepts connections on port: **5432**, but after revers proxy
+  configuration it shouldn't be accessible directly</span>
+
+To list all modules and ports mappings, please use presented below command:
+
+```
+docker-compose -f docker-compose-all.yml ps
+```
+
+---
+
 ## Status
+
 This project is still under development.

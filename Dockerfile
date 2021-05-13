@@ -1,10 +1,11 @@
-FROM gradle:jdk11 AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
+FROM gradle:jdk11 AS builder
+WORKDIR /home/gradle/patronage21-java
+COPY --chown=gradle:gradle build.gradle settings.gradle ./
+COPY --chown=gradle:gradle src/ ./src
 RUN gradle build --no-daemon
 
 FROM adoptopenjdk/openjdk11:alpine
 RUN mkdir /app
-COPY --from=build /home/gradle/src/build/libs/*jar /app/spring-boot-application.jar
+COPY --from=builder /home/gradle/patronage21-java/./build/libs/*.jar /app/patronage21.jar
 EXPOSE 8080
-ENTRYPOINT [ "java", "-jar", "/app/spring-boot-application.jar" ]
+ENTRYPOINT [ "java", "-jar", "/app/patronage21.jar" ]
