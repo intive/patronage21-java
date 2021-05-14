@@ -1,16 +1,22 @@
 package com.intive.patronative.service;
 
+import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.dto.model.UserDTO;
 import com.intive.patronative.dto.model.UsersDTO;
-import com.intive.patronative.dto.profile.User;
 import com.intive.patronative.exception.InvalidArgumentException;
+import com.intive.patronative.exception.UserNotFoundException;
+import com.intive.patronative.mapper.UserMapper;
+import com.intive.patronative.repository.ProjectRepository;
+import com.intive.patronative.repository.UserRepository;
 import com.intive.patronative.validation.UserSearchValidator;
+import com.intive.patronative.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Calendar;
 
 @Slf4j
 @Service
@@ -18,12 +24,18 @@ import java.util.Arrays;
 public class UserService {
 
     private final UserSearchValidator userSearchValidator;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
-    public void saveUser(UserDTO dto) {
+    public void saveUser(final UserDTO userDTO) {
     }
 
-    public void update(final User user) {
-        log.info("Evoking service...");
+    public void updateUser(final UserEditDTO userEditDTO) {
+        new UserValidator().validateUserData(userEditDTO);
+
+        userRepository.save(UserMapper.mapToEntity(userEditDTO,
+                userRepository.findByLogin(userEditDTO.getLogin()).orElseThrow(() -> new UserNotFoundException("login", userEditDTO.getLogin())),
+                projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR))));
     }
 
     public UsersDTO searchUser(final UserSearchDTO userSearchDTO) throws InvalidArgumentException {
@@ -37,4 +49,5 @@ public class UserService {
                         new UserDTO("someLogin2", "Dick", "Hunt", "hdick@gmail.com", "654987321", "https://github.com/hdick", "hdick")))
                 .build();
     }
+
 }

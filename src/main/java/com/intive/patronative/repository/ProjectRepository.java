@@ -13,4 +13,5 @@ import java.util.Set;
 public interface ProjectRepository extends JpaRepository<Project, BigDecimal> {
     @Query("SELECT DISTINCT p.name FROM Project p where p.year = :year")
     Set<String> getDistinctProjectNamesByYear(@Param("year") int year);
+    Set<Project> findAllByYear(final int year);
 }

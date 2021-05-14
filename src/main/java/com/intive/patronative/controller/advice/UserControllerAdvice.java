@@ -1,6 +1,7 @@
 package com.intive.patronative.controller.advice;
 
 import com.intive.patronative.exception.InvalidArgumentException;
+import com.intive.patronative.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,9 +22,9 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class UserControllerAdvice {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     ValidationErrorResponse onMethodArgumentNotValidException(final MethodArgumentNotValidException exception) {
         return buildErrorResponse(exception.getFieldErrors());
     }
@@ -40,6 +41,13 @@ public class UserControllerAdvice {
     @ExceptionHandler(InvalidArgumentException.class)
     public ValidationErrorResponse invalidArgumentHandler(final InvalidArgumentException exception) {
         return buildErrorResponse(exception.getFieldErrors());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UserNotFoundException.class)
+    public ValidationErrorResponse userNotFoundHandler(final UserNotFoundException exception) {
+        return buildErrorResponse(Collections.singletonList(exception.getFieldError()));
     }
 
     @Data
