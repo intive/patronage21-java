@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: patronative_db_${APP_ENV}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: p4tron4tiv3
+      POSTGRES_DB: patronative
+  app:
+    container_name: patronative_app_${APP_ENV}
+    build:
+      context: .
+    ports:
+      - ${APP_PORT}:8080
+    depends_on:
+      - "postgres"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patronative_db_${APP_ENV}:5432/patronative
+volumes:
+  pgdata:
