@@ -14,5 +14,4 @@ public class UserDTO {
     @NotBlank(message = "Can not be empty") String email;
     @NotBlank(message = "Can not be empty") String phoneNumber;
     @NotBlank(message = "Can not be empty") String gitHubUrl;
-    @NotBlank(message = "Can not be empty") String userName;
 }
