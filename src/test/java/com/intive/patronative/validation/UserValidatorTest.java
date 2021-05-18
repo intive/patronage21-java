@@ -55,15 +55,15 @@ class UserValidatorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("validUsernames")
-    void isUsernameValid_shouldReturnTrue(final String username) {
-        assertTrue(UserValidator.isUsernameValid(username));
+    @MethodSource("validLogin")
+    void isLoginValid_shouldReturnTrue(final String login) {
+        assertTrue(UserValidator.isLoginValid(login));
     }
 
     @ParameterizedTest
-    @MethodSource("invalidUsernames")
-    void isUsernameValid_shouldReturnFalse(final String username) {
-        assertFalse(UserValidator.isUsernameValid(username));
+    @MethodSource("invalidLogin")
+    void isLoginValid_shouldReturnFalse(final String login) {
+        assertFalse(UserValidator.isLoginValid(login));
     }
 
     @ParameterizedTest
@@ -132,11 +132,11 @@ class UserValidatorTest {
                 " Gąsienica", "Gąsi$r", "markowsk@", "Curu1", "Cu- ru", "");
     }
 
-    private static Stream<String> validUsernames() {
+    private static Stream<String> validLogin() {
         return Stream.of("lucas", "lucas123", "123lucas", "luc123as", "Lucas", "nameSurname");
     }
 
-    private static Stream<String> invalidUsernames() {
+    private static Stream<String> invalidLogin() {
         return Stream.of(null, "Luca-", "Hi Mark", "123-patrick", "Bob*the*builder", "-masha", "the+Bear");
     }
 
@@ -145,26 +145,27 @@ class UserValidatorTest {
     }
 
     private static Stream<String> invalidEmails() {
-        return Stream.of(null, "lucas-Smith@mail.pl", "SMIT HLUCAS@emailo.com", "lucassmith123@gmail.u", "expresive.mail@mail.polska",
+        return Stream.of(null, "lucas-Smith@mail.pl", "SMIT HLUCAS@emailo.com", "expresive.mail@mail.polska",
                 "lucasSmith+mail.pl", "SMITHLUCAS@emailocom", "lucassmith123@.uk", "expresive.mail@mail.PL", "ęxpresive.mail@mail.pl");
     }
 
     private static Stream<String> validPhones() {
-        return Stream.of("123456789", "0123456789", "48123456789");
+        return Stream.of("123456789");
     }
 
     private static Stream<String> invalidPhones() {
-        return Stream.of(null, "123 456 789", "01 23456789", "48 123 456 789", "48-123-456-789", "48 4878912", "1234567");
+        return Stream.of(null, "123 456 789", "01 23456789", "48 123 456 789", "48-123-456-789", "48 4878912",
+                "1234567", "48123456789", "0123456789");
     }
 
     private static Stream<String> validGithub() {
         return Stream.of("https://github.com/username1234", "https://github.com/username", "https://github.com/1234",
-                "https://github.com/USERNAME", "https://github.com/user-name", "https://github.com/patronage-java-2021",
-                "https://github.com/user", "https://github.com/1234", "https://github.com/luca-12");
+                "https://github.com/USERNAME", "https://www.github.com/user-name", "http://www.github.com/patronage-java-2021",
+                "www.github.com/user", "http://github.com/1234", "github.com/luca-12");
     }
 
     private static Stream<String> invalidGithub() {
-        return Stream.of(null, "https://github.com/ósername", "https://github.com/user_name", "username", "https://github.com/use",
+        return Stream.of(null, "https://github.com/ósername", "https://github.com/user_name", "username",
                 "https://github.com/-user-name", "https://github.com/user-name-", "https://github.com/-user-name-");
     }
 
@@ -195,13 +196,13 @@ class UserValidatorTest {
                         null, Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
                 new UserEditDTO("SomeLogin", null, null, null, null, null, null,
                         Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
-                new UserEditDTO("SomeLogin", "Mike", "Wazofski", "m.wasoff@minc.mc", "1123456789", "https://github.com/leeBronzJamez",
+                new UserEditDTO("SomeLogin", "Mike", "Wazofski", "m.wasoff@minc.mc", "123456789", "https://www.github.com/leeBronzJamez",
                         null, Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
                 new UserEditDTO("SomeLogin", "Mark", "Zucker", "ZuckBerk@fb.com", "918273645", null, null,
                         Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
                 new UserEditDTO("SomeLogin", "Mark", "Zucker", "Zuck.Berk@fb.com", "918273645", null, "username102",
                         Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
-                new UserEditDTO(null, "łukasz", "śmith-zerga", null, "48123456789", "https://github.com/user-name-1234",
+                new UserEditDTO(null, "łukasz", "śmith-zerga", null, "123456789", "https://github.com/user-name-1234",
                         "bio", Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build()))
         );
     }

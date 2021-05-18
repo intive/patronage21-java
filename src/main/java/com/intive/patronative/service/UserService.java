@@ -54,7 +54,7 @@ public class UserService {
     }
 
     public UserResponseDTO getUserByLogin(final String login) {
-        if (!UserValidator.isUsernameValid(login)) {
+        if (!UserValidator.isLoginValid(login)) {
             throw new InvalidArgumentException("login", login);
         }
 

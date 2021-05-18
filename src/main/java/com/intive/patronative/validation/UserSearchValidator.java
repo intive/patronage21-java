@@ -49,7 +49,7 @@ public class UserSearchValidator {
 
     private Optional<FieldError> checkUsername(final String username) {
         final var usernameMessage = "Letters or numbers, minimum " + userSearchDataMinLength + " letters";
-        return (username != null) && (!UserValidator.isUsernameValid(username) || isLengthInvalid(username)) ?
+        return (username != null) && (!UserValidator.isLoginValid(username) || isLengthInvalid(username)) ?
                 Optional.of(new FieldError("String", "username", username, false, null, null, usernameMessage)) :
                 Optional.empty();
     }

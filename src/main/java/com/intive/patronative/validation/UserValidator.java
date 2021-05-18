@@ -26,23 +26,40 @@ public class UserValidator {
     private int projectsParticipationLimit;
 
     private static final int BIO_LENGTH = 512;
-    private static final int GITHUB_LENGTH = 256;
+    private static final int PHONE_NUMBER_LENGTH = 9;
+    private static final int MIN_NAME_LENGTH = 2;
+    private static final int MAX_NAME_LENGTH = 30;
+    private static final int MIN_LOGIN_LENGTH = 2;
+    private static final int MAX_LOGIN_LENGTH = 15;
+    private static final int MIN_EMAIL_USERNAME_LENGTH = 3;
+    private static final int MAX_EMAIL_USERNAME_LENGTH = 30;
     private static final int MIN_GITHUB_USERNAME_LENGTH = 4;
-    private static final String BASE_GITHUB_LINK = "https://github.com/";
-    private static final Pattern FIRST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{2,64}$");
-    private static final Pattern LAST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{2,31}[- ]?[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{2,31}$");
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9]{2,32}$");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9.]{4,45}+[@][a-zA-Z]{2,10}[.][a-z]{2,5}$");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,16}$");
-    private static final Pattern GITHUB_PATTERN = Pattern.compile("^" + BASE_GITHUB_LINK + "[a-zA-Z0-9]+([-?][a-zA-Z0-9]+)*$");
+    private static final int MAX_GITHUB_USERNAME_LENGTH = 39;
+    private static final String BASE_GITHUB_LINK = "github.com/";
+    private static final String FULL_GITHUB_LINK = "https://www.github.com/";
 
-    private static final String FIRST_NAME_MESSAGE = "Only letters, 2 to 64 letters";
-    private static final String LAST_NAME_MESSAGE = "Only letters, dash or space allowed for two part surnames, each surname 2 to 32 letters";
-    private static final String EMAIL_MESSAGE = "Example e-mail: example.Mail123@mail.com";
-    private static final String PHONE_MESSAGE = "9 to 16 numbers";
-    private static final String GITHUB_MESSAGE = "Letters, numbers and dashes allowed, username minimum 4 characters, " +
-            "has to start with https://github.com/, username cannot start or end with dash";
-    private static final String BIO_MESSAGE = "Bio up to 512 characters";
+    private static final Pattern FIRST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{" + MIN_NAME_LENGTH +
+            "," + MAX_NAME_LENGTH + "}$");
+    private static final Pattern LAST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{" + MIN_NAME_LENGTH +
+            "," + MAX_NAME_LENGTH + "}([- ][a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{" + MIN_NAME_LENGTH + "," + MAX_NAME_LENGTH + "})?$");
+    private static final Pattern LOGIN_PATTERN = Pattern.compile("^[a-zA-Z0-9]{" + MIN_LOGIN_LENGTH + "," + MAX_LOGIN_LENGTH + "}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9.]{" + MIN_EMAIL_USERNAME_LENGTH +
+            "," + MAX_EMAIL_USERNAME_LENGTH + "}+[@][a-zA-Z]{1,15}[.][a-z]{1,5}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{" + PHONE_NUMBER_LENGTH + "}$");
+    private static final Pattern GITHUB_PATTERN = Pattern.compile("^(https?://)?(www.)?" + BASE_GITHUB_LINK +
+            "[a-zA-Z0-9](?:[a-zA-Z\\d]|-(?=[a-zA-Z\\d])){" + (MIN_GITHUB_USERNAME_LENGTH - 1) + "," + (MAX_GITHUB_USERNAME_LENGTH - 1) + "}$");
+
+    private static final String FIRST_NAME_MESSAGE = "Only letters, " + MIN_NAME_LENGTH + " to " + MAX_NAME_LENGTH + " letters";
+    private static final String LAST_NAME_MESSAGE = "Only letters, dash or space allowed for two part surnames, each surname " +
+            MIN_NAME_LENGTH + " to " + MAX_NAME_LENGTH + " letters";
+    private static final String LOGIN_MESSAGE = "Letters and numbers, " + MIN_LOGIN_LENGTH + " to " + MAX_LOGIN_LENGTH + " characters";
+    private static final String EMAIL_MESSAGE = "Example e-mail: example.Mail123@mail.com, username part " + MIN_EMAIL_USERNAME_LENGTH +
+            " to " + MAX_EMAIL_USERNAME_LENGTH + " characters";
+    private static final String PHONE_MESSAGE = PHONE_NUMBER_LENGTH + " digits required";
+    private static final String GITHUB_MESSAGE = "Letters, numbers and dashes allowed, username minimum " + MIN_GITHUB_USERNAME_LENGTH +
+            " characters, should start with " + FULL_GITHUB_LINK + ", username cannot start or end with dash, username cannot exceed " +
+            MAX_GITHUB_USERNAME_LENGTH;
+    private static final String BIO_MESSAGE = "Bio up to " + BIO_LENGTH + " characters";
     private static final String PROJECT_MAX_PARTICIPATION_MESSAGE = "Maximum number of projects in which you can participate is: ";
 
     public void validateUserData(final UserEditDTO userDTO) {
@@ -61,8 +78,8 @@ public class UserValidator {
         return (lastName != null) && LAST_NAME_PATTERN.matcher(lastName).matches();
     }
 
-    public static boolean isUsernameValid(final String username) {
-        return (username != null) && USERNAME_PATTERN.matcher(username).matches();
+    public static boolean isLoginValid(final String login) {
+        return (login != null) && LOGIN_PATTERN.matcher(login).matches();
     }
 
     public static boolean isEmailValid(final String email) {
@@ -74,8 +91,7 @@ public class UserValidator {
     }
 
     public static boolean isGithubValid(final String github) {
-        return (github != null) && ((GITHUB_PATTERN.matcher(github).matches()) && (github.length() <= GITHUB_LENGTH)
-                && (github.length() >= (BASE_GITHUB_LINK.length() + MIN_GITHUB_USERNAME_LENGTH)));
+        return (github != null) && (GITHUB_PATTERN.matcher(github).matches());
     }
 
     public static boolean isBioValid(final String bio) {
@@ -84,7 +100,8 @@ public class UserValidator {
 
     private List<FieldError> getFieldErrors(final UserEditDTO userEditDTO) {
         if (userEditDTO != null) {
-            return Stream.of(checkFirstName(userEditDTO.getFirstName()),
+            return Stream.of(checkLogin(userEditDTO.getLogin()),
+                    checkFirstName(userEditDTO.getFirstName()),
                     checkLastName(userEditDTO.getLastName()),
                     checkEmail(userEditDTO.getEmail()),
                     checkPhone(userEditDTO.getPhoneNumber()),
@@ -95,6 +112,12 @@ public class UserValidator {
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
+    }
+
+    private FieldError checkLogin(final String login) {
+        return (login == null) || (isLoginValid(login))
+                ? null
+                : getFieldError("login", login, LOGIN_MESSAGE);
     }
 
     private FieldError checkFirstName(final String firstName) {

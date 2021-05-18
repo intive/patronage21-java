@@ -121,7 +121,7 @@ class UserServiceTest {
     }
 
     private static Stream<String> validNonExistingLogin() {
-        return Stream.of("nonExistingLogin");
+        return Stream.of("nonExisting");
     }
 
     private static Stream<String> invalidLogin() {
