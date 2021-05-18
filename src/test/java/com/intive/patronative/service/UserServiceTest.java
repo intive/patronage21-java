@@ -1,6 +1,7 @@
 package com.intive.patronative.service;
 
 import com.intive.patronative.mapper.UserMapper;
+import com.intive.patronative.validation.UserValidator;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -38,7 +39,9 @@ class UserServiceTest {
     @Mock
     private UserSearchValidator userSearchValidator;
     @Mock
-    UserMapper userMapper;
+    private UserValidator userValidator;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
     private UserService userService;
 
@@ -68,6 +71,7 @@ class UserServiceTest {
     @ParameterizedTest
     @MethodSource("invalidUserData")
     void updateUser_shouldThrowInvalidArgumentException(final UserEditDTO userEditDTO) {
+        Mockito.doThrow(InvalidArgumentException.class).when(userValidator).validateUserData(userEditDTO);
         assertThrows(InvalidArgumentException.class, () -> userService.updateUser(userEditDTO));
     }
 

@@ -13,16 +13,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserValidatorTest {
 
+    UserValidator userValidator = new UserValidator(5);
+
     @ParameterizedTest
     @MethodSource("validUserData")
     void validateUserData_shouldNotThrow(final UserEditDTO userEditDTO) {
-        assertDoesNotThrow(() -> new UserValidator().validateUserData(userEditDTO));
+        assertDoesNotThrow(() -> userValidator.validateUserData(userEditDTO));
     }
 
     @ParameterizedTest
     @MethodSource("invalidUserData")
     void validateUserData_shouldThrowInvalidArgumentException(final UserEditDTO userEditDTO) {
-        assertThrows(InvalidArgumentException.class, () -> new UserValidator().validateUserData(userEditDTO));
+        assertThrows(InvalidArgumentException.class, () -> userValidator.validateUserData(userEditDTO));
     }
 
     @ParameterizedTest

@@ -25,6 +25,7 @@ import java.util.Calendar;
 public class UserService {
 
     private final UserSearchValidator userSearchValidator;
+    private final UserValidator userValidator;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
@@ -33,7 +34,7 @@ public class UserService {
     }
 
     public void updateUser(final UserEditDTO userEditDTO) {
-        new UserValidator().validateUserData(userEditDTO);
+        userValidator.validateUserData(userEditDTO);
 
         userRepository.save(userMapper.mapToEntity(userEditDTO,
                 userRepository.findByLogin(userEditDTO.getLogin()).orElseThrow(() -> new UserNotFoundException("login", userEditDTO.getLogin())),

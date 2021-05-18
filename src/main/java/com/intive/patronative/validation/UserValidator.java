@@ -1,17 +1,29 @@
 package com.intive.patronative.validation;
 
+import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Component
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserValidator {
+
+    @Value("${validators.user.projects.maximum-participation}")
+    private int projectsParticipationLimit;
 
     private static final int BIO_LENGTH = 512;
     private static final int GITHUB_LENGTH = 256;
@@ -31,6 +43,7 @@ public class UserValidator {
     private static final String GITHUB_MESSAGE = "Letters, numbers and dashes allowed, username minimum 4 characters, " +
             "has to start with https://github.com/, username cannot start or end with dash";
     private static final String BIO_MESSAGE = "Bio up to 512 characters";
+    private static final String PROJECT_MAX_PARTICIPATION_MESSAGE = "Maximum number of projects in which you can participate is: ";
 
     public void validateUserData(final UserEditDTO userDTO) {
         final var fieldErrors = getFieldErrors(userDTO);
@@ -76,7 +89,8 @@ public class UserValidator {
                     checkEmail(userEditDTO.getEmail()),
                     checkPhone(userEditDTO.getPhoneNumber()),
                     checkGithub(userEditDTO.getGitHubUrl()),
-                    checkBio(userEditDTO.getBio()))
+                    checkBio(userEditDTO.getBio()),
+                    checkProjects(userEditDTO.getProjects()))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
@@ -117,6 +131,12 @@ public class UserValidator {
         return (bio == null) || (isBioValid(bio))
                 ? null
                 : getFieldError("bio", bio, BIO_MESSAGE);
+    }
+
+    private FieldError checkProjects(final Set<ProjectDTO> projects) {
+        return (projects == null) || (projects.size() <= projectsParticipationLimit)
+                ? null
+                : getFieldError("projects", "", PROJECT_MAX_PARTICIPATION_MESSAGE + projectsParticipationLimit);
     }
 
     private FieldError getFieldError(final String fieldName, final String fieldValue, final String message) {
