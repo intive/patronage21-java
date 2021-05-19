@@ -7,6 +7,7 @@ import com.intive.patronative.repository.model.ProjectRole;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,27 +25,28 @@ public class ProjectMapper {
                 .collect(Collectors.toSet()));
     }
 
-    public List<ProjectDTO> mapToProjectDTOList(final Set<Project> projects) {
-        return projects.stream()
-                .map(this::mapToProjectDTO)
-                .collect(Collectors.toList());
+    public List<ProjectDTO> mapToProjectDTOList(final Set<Project> entityProjects) {
+        return Optional.ofNullable(entityProjects)
+                .map(projects -> projects.stream()
+                        .map(this::mapToProjectDTO)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
-    public ProjectDTO mapToProjectDTO(final Project project) {
-        return (project == null)
-                ? ProjectDTO.builder().build()
-                : ProjectDTO.builder()
-                .name(project.getName())
-                .role(getProjectRole(project)
-                        .map(ProjectRole::getName)
-                        .orElse(null))
-                .build();
+    public ProjectDTO mapToProjectDTO(final Project entityProject) {
+        return Optional.ofNullable(entityProject)
+                .map(project -> ProjectDTO.builder()
+                        .name(project.getName())
+                        .role(getProjectRole(project).map(ProjectRole::getName).orElse(null))
+                        .build())
+                .orElse(null);
     }
 
     private Optional<ProjectRole> getProjectRole(Project project) {
-        return project.getProjectRoles()
-                .stream()
-                .findAny();
+        return Optional.ofNullable(project)
+                .map(Project::getProjectRoles)
+                .flatMap(projectRoles -> projectRoles.stream().findAny());
     }
 
     private static Optional<Project> getProject(final Set<Project> entityProjects, final ProjectDTO projectDTO) {
