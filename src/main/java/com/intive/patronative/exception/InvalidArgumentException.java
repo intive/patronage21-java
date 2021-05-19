@@ -17,4 +17,5 @@ public class InvalidArgumentException extends RuntimeException {
     public InvalidArgumentException(final String fieldName, final String fieldValue) {
         this.fieldErrors = Collections.singletonList(new FieldError("String", fieldName, fieldValue, false, null, null, DEFAULT_MESSAGE));
     }
+
 }
