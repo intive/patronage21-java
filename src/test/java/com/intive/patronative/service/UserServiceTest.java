@@ -82,6 +82,7 @@ class UserServiceTest {
     @MethodSource("validLogin")
     void getUser_shouldNotThrow(final String login) {
         Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.of(exampleUser()));
+        Mockito.when(userValidator.isLoginValid(login)).thenReturn(true);
         assertDoesNotThrow(() -> userService.getUserByLogin(login));
     }
 
@@ -89,12 +90,14 @@ class UserServiceTest {
     @MethodSource("validLogin")
     void getUser_shouldThrowUserNotFoundException(final String login) {
         Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+        Mockito.when(userValidator.isLoginValid(login)).thenReturn(true);
         assertThrows(UserNotFoundException.class, () -> userService.getUserByLogin(login));
     }
 
     @ParameterizedTest
     @MethodSource("invalidLogin")
     void getUser_shouldThrowInvalidArgumentException(final String login) {
+        Mockito.when(userValidator.isLoginValid(login)).thenReturn(false);
         assertThrows(InvalidArgumentException.class, () -> userService.getUserByLogin(login));
     }
 
@@ -102,6 +105,7 @@ class UserServiceTest {
     @MethodSource("validLogin")
     void deactivateUser_shouldNotThrow(final String login) {
         Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.of(new User()));
+        Mockito.when(userValidator.isLoginValid(login)).thenReturn(true);
         assertDoesNotThrow(() -> userService.deactivateUserByLogin(login));
     }
 
@@ -109,12 +113,14 @@ class UserServiceTest {
     @MethodSource("validLogin")
     void deactivateUser_shouldThrowUserNotFoundException(final String login) {
         Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+        Mockito.when(userValidator.isLoginValid(login)).thenReturn(true);
         assertThrows(UserNotFoundException.class, () -> userService.deactivateUserByLogin(login));
     }
 
     @ParameterizedTest
     @MethodSource("invalidLogin")
     void deactivateUser_shouldInvalidArgumentException(final String login) {
+        Mockito.when(userValidator.isLoginValid(login)).thenReturn(false);
         assertThrows(InvalidArgumentException.class, () -> userService.deactivateUserByLogin(login));
     }
 
@@ -123,6 +129,7 @@ class UserServiceTest {
     void deleteImage_shouldNotThrow(final User user) {
         // when
         Mockito.when(userRepository.findByLogin(Mockito.anyString())).thenReturn(Optional.ofNullable(user));
+        Mockito.when(userValidator.isLoginValid("AnnaNowak")).thenReturn(true);
         // then
         assertDoesNotThrow(() -> userService.deleteImage("AnnaNowak"));
     }

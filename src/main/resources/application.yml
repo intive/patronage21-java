@@ -9,18 +9,38 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-    #      ddl-auto: validate
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         globally_quoted_identifiers: true
 validators:
   search:
-    user:
-      data:
-        length:
-          min: 2
-          max: 125
+    data:
+      length:
+        min: 2
   user:
+    first-name:
+      length:
+        min: 2
+        max: 30
+    last-name:
+      length:
+        min: 2
+        max: 30
+    login:
+      length:
+        min: 2
+        max: 15
+    email-username:
+      length:
+        min: 3
+        max: 30
+    phone-number:
+      length: 9
+    github-username:
+      length:
+        min: 4
+        max: 39
     projects:
       maximum-participation: 5

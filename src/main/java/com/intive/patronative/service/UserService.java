@@ -63,6 +63,7 @@ public class UserService {
     public UsersDTO searchUsers(final String firstName, final String lastName, final String login, final UserRole role,
                                 final UserStatus status, final String technologyGroup, final String other) {
         final var userSearchDTO = new UserSearchDTO(firstName, lastName, login, role, status, technologyGroup, other);
+
         userSearchValidator.validateSearchParameters(userSearchDTO);
 
         final List<User> fetchedUsers = userRepository.findAllUsers(userSearchDTO);
@@ -90,7 +91,7 @@ public class UserService {
     }
 
     private User getUserFromDatabaseByLogin(final String login) {
-        if (!UserValidator.isLoginValid(login)) {
+        if (!userValidator.isLoginValid(login)) {
             throw new InvalidArgumentException("login", login);
         }
 

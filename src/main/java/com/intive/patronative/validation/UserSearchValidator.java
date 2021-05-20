@@ -2,32 +2,45 @@ package com.intive.patronative.validation;
 
 import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-@NoArgsConstructor
-@AllArgsConstructor
-@PropertySource("classpath:application.yml")
+@RequiredArgsConstructor
 public class UserSearchValidator {
 
-    @Value("${validators.search.user.data.length.min}")
-    private int userSearchDataMinLength;
+    private static final int MAX_OTHER_LENGTH = 162;
+    private static final int MAX_TECHNOLOGY_GROUP_NAME_LENGTH = 32;
+    private static final Matcher OTHER_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9 -]+$").matcher("");
+    private static final Matcher TECHNOLOGY_GROUP_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9() -]+$").matcher("");
 
-    @Value("${validators.search.user.data.length.max}")
-    private int userSearchDataMaxLength;
+    private final UserValidator userValidator;
 
-    public void validateSearchParameters(final UserSearchDTO userSearchDTO) {
+    @Value("${validators.search.data.length.min}")
+    private int minSearchDataLength;
+    private int maxOtherLength;
+
+    @PostConstruct
+    private void setMaxOtherLength() {
+        final var lengthOfTwoSpaces = 2;
+
+        this.maxOtherLength = lengthOfTwoSpaces + userValidator.getMaxLoginLength() + userValidator.getMaxFirstNameLength() +
+                userValidator.getMaxLastNameLength();
+    }
+
+    public void validateSearchParameters(final UserSearchDTO userSearchDTO) throws InvalidArgumentException {
         final var fieldErrors = getFieldErrors(userSearchDTO);
 
         if (!fieldErrors.isEmpty()) {
@@ -35,65 +48,75 @@ public class UserSearchValidator {
         }
     }
 
-    private Optional<FieldError> checkFirstName(final String firstName) {
-        final var firstNameMessage = "Letters only, " + getMinMaxCharactersMessage();
-        return (firstName == null) || (UserValidator.isFirstNameValid(firstName) && isLengthValid(firstName))
-                ? Optional.empty()
-                : Optional.of(new FieldError("String", "firstName", firstName, false, null, null, firstNameMessage));
-    }
-
-    private Optional<FieldError> checkLastName(final String lastName) {
-        final var lastNameMessage = "Letters only, dash/space allowed in case of two-part surname, " +
-                getMinMaxCharactersMessage();
-        return (lastName == null) || (UserValidator.isLastNameValid(lastName) && isLengthValid(lastName))
-                ? Optional.empty()
-                : Optional.of(new FieldError("String", "lastName", lastName, false, null, null, lastNameMessage));
-    }
-
-    private Optional<FieldError> checkLogin(final String login) {
-        final var loginMessage = "Letters or numbers, " + getMinMaxCharactersMessage();
-        return (login == null) || (UserValidator.isLoginValid(login) && isLengthValid(login))
-                ? Optional.empty()
-                : Optional.of(new FieldError("String", "login", login, false, null, null, loginMessage));
-    }
-
-    private Optional<FieldError> checkOther(final String other) {
-        final var otherMessage = "Letters, spaces, numbers and dashes allowed, " + getMinMaxCharactersMessage();
-        return (other == null) || (UserValidator.isOtherValid(other) && isLengthValid(other))
-                ? Optional.empty()
-                : Optional.of(new FieldError("String", "other", other, false, null, null, otherMessage));
-    }
-
-    private Optional<FieldError> checkTechnologyGroup(final String technologyGroup) {
-        final var technologyGroupMessage = "Letters or numbers, dash/space/parentheses allowed, " +
-                getMinMaxCharactersMessage();
-        return (technologyGroup == null) || (UserValidator.isTechnologyGroupValid(technologyGroup) && isLengthValid(technologyGroup))
-                ? Optional.empty()
-                : Optional.of(new FieldError("String", "technologyGroup", technologyGroup, false, null, null, technologyGroupMessage));
-    }
-
-    private String getMinMaxCharactersMessage() {
-        return "minimum " + userSearchDataMinLength + " characters, maximum " + userSearchDataMaxLength + " characters";
-    }
-
     private List<FieldError> getFieldErrors(final UserSearchDTO userSearchDTO) {
-        if (userSearchDTO != null) {
-            return Stream.of(checkFirstName(userSearchDTO.getFirstName()),
-                    checkLastName(userSearchDTO.getLastName()),
-                    checkLogin(userSearchDTO.getLogin()),
-                    checkOther(userSearchDTO.getOther()),
-                    checkTechnologyGroup(userSearchDTO.getTechnologyGroup()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-        }
-
-        return Collections.emptyList();
+        return Optional.ofNullable(userSearchDTO)
+                .map(user -> Stream
+                        .of(checkLogin(user.getLogin()),
+                                checkFirstName(user.getFirstName()),
+                                checkLastName(user.getLastName()),
+                                checkOther(user.getOther()),
+                                checkTechnologyGroup(user.getTechnologyGroup()))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
-    private boolean isLengthValid(final String userSearchData) {
-        return (userSearchData != null) &&
-                ((userSearchData.length() >= userSearchDataMinLength) &&
-                        (userSearchData.length() <= userSearchDataMaxLength));
+    private FieldError checkLogin(final String login) {
+        final var loginMessage = "Letters and numbers, " +
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLoginLength());
+
+        return ((login == null) || (ValidationHelper.checkLength(login, minSearchDataLength, userValidator.getMaxLoginLength())
+                && userValidator.isLoginValid(login)))
+                ? null
+                : ValidationHelper.getFieldError("login", login, loginMessage);
     }
+
+    private FieldError checkFirstName(final String firstName) {
+        final var firstNameMessage = "Letters only, capital and Polish letters allowed, " +
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxFirstNameLength());
+
+        return ((firstName == null) || (ValidationHelper.checkLength(firstName, minSearchDataLength, userValidator.getMaxFirstNameLength())
+                && userValidator.isFirstNameValid(firstName)))
+                ? null
+                : ValidationHelper.getFieldError("firstName", firstName, firstNameMessage);
+    }
+
+    private FieldError checkLastName(final String lastName) {
+        final var lastNameMessage = "Letters only, capital and Polish letters allowed, either dash or space in case of two-part surname, "
+                + ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLastNameLength());
+
+        return ((lastName == null) || (ValidationHelper.checkLength(lastName, minSearchDataLength, userValidator.getMaxLastNameLength())
+                && userValidator.isLastNameValid(lastName)))
+                ? null
+                : ValidationHelper.getFieldError("lastName", lastName, lastNameMessage);
+    }
+
+    private FieldError checkOther(final String other) {
+        final var otherMessage = "Letters, spaces, numbers and dashes allowed, " +
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, maxOtherLength);
+
+        return ((other == null) || (ValidationHelper.checkLength(other, minSearchDataLength, maxOtherLength)
+                && isOtherValid(other)))
+                ? null
+                : ValidationHelper.getFieldError("other", other, otherMessage);
+    }
+
+    private boolean isOtherValid(final String other) {
+        return (other != null) && (other.length() <= MAX_OTHER_LENGTH) && OTHER_MATCHER.reset(other).matches();
+    }
+
+    private FieldError checkTechnologyGroup(final String technologyGroup) {
+        final var technologyGroupMessage = "Letters or numbers, dash/space/parentheses allowed, " +
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH);
+
+        return ((technologyGroup == null) || (ValidationHelper.checkLength(technologyGroup, minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH)
+                && isTechnologyGroupValid(technologyGroup)))
+                ? null
+                : ValidationHelper.getFieldError("technologyGroup", technologyGroup, technologyGroupMessage);
+    }
+
+    private boolean isTechnologyGroupValid(final String technologyGroup) {
+        return (technologyGroup != null) && TECHNOLOGY_GROUP_MATCHER.reset(technologyGroup).matches();
+    }
+
 }
