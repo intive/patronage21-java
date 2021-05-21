@@ -14,4 +14,8 @@ public class UserSearchDTO {
     String login;
     @Nullable
     UserRole role;
+    @Nullable
+    String technologyGroup;
+    @Nullable
+    String other;
 }

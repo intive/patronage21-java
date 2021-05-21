@@ -10,14 +10,16 @@ import com.intive.patronative.exception.UserNotFoundException;
 import com.intive.patronative.mapper.UserMapper;
 import com.intive.patronative.repository.ProjectRepository;
 import com.intive.patronative.repository.UserRepository;
+import com.intive.patronative.dto.profile.UserRole;
+import com.intive.patronative.repository.model.User;
 import com.intive.patronative.validation.UserSearchValidator;
 import com.intive.patronative.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -41,16 +43,13 @@ public class UserService {
                 projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR))));
     }
 
-    public UsersDTO searchUser(final UserSearchDTO userSearchDTO) throws InvalidArgumentException {
-        log.info("Called userService");
-
+    public UsersDTO searchUsers(final String firstName, final String lastName, final String login, final UserRole role,
+                                final String technologyGroup, String other) {
+        final var userSearchDTO = new UserSearchDTO(firstName, lastName, login, role, technologyGroup, other);
         userSearchValidator.validateSearchParameters(userSearchDTO);
+        final List<User> fetchedUsers = userRepository.findAllUsers(userSearchDTO);
 
-        return UsersDTO.builder()
-                .users(Arrays.asList(new UserDTO("someLogin", "Lucas", "Smith", "lsmith@gmail.com", "123456789", "https://github.com/lsmith"),
-                        new UserDTO("someLogin1", "Mark", "Marcuson", "marcuson@gmail.com", "98765421", "https://github.com/marcuson"),
-                        new UserDTO("someLogin2", "Dick", "Hunt", "hdick@gmail.com", "654987321", "https://github.com/hdick")))
-                .build();
+        return userMapper.mapEntitiesToUsersResponse(fetchedUsers);
     }
 
     public UserResponseDTO getUserByLogin(final String login) {

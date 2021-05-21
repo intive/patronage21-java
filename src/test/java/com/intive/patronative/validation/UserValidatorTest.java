@@ -114,6 +114,18 @@ class UserValidatorTest {
         assertFalse(UserValidator.isBioValid(bio));
     }
 
+    @ParameterizedTest
+    @MethodSource("validOther")
+    void isOtherValid_shouldReturnTrue(final String other) {
+        assertTrue(UserValidator.isOtherValid(other));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidOther")
+    void isOtherValid_shouldReturnFalse(final String other) {
+        assertFalse(UserValidator.isOtherValid(other));
+    }
+
     private static Stream<String> validFirstNames() {
         return Stream.of("lucas", "Lucas", "łukasz", "Łukasz", "MatEuSZ", "Arabella", "OL");
     }
@@ -156,6 +168,15 @@ class UserValidatorTest {
     private static Stream<String> invalidPhones() {
         return Stream.of(null, "123 456 789", "01 23456789", "48 123 456 789", "48-123-456-789", "48 4878912",
                 "1234567", "48123456789", "0123456789");
+    }
+
+    private static Stream<String> validOther() {
+        return Stream.of("lucas", "lucas123", " Lucas", "Johnnie-walker", "ucas", "Luciano Cruz-Coke Carvallo");
+    }
+
+    private static Stream<String> invalidOther() {
+        return Stream.of(null, "", "H", "Bob*the*builder",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta lorem quis tristique tempus. Morbi sit amet dui nulla. Phasellus");
     }
 
     private static Stream<String> validGithub() {

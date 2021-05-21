@@ -20,6 +20,7 @@ validators:
       data:
         length:
           min: 2
+          max: 125
   user:
     projects:
       maximum-participation: 5
