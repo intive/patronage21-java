@@ -35,9 +35,9 @@ public class UserFrontController {
     })
     public ResponseEntity<UsersDTO> search(@RequestParam(required = false) final String firstName,
                                            @RequestParam(required = false) final String lastName,
-                                           @RequestParam(required = false) final String username,
+                                           @RequestParam(required = false) final String login,
                                            @RequestParam(required = false) final UserRole role) throws InvalidArgumentException {
-        return ResponseEntity.ok(userService.searchUser(new UserSearchDTO(firstName, lastName, username, role)));
+        return ResponseEntity.ok(userService.searchUser(new UserSearchDTO(firstName, lastName, login, role)));
     }
 
     @GetMapping("/{login}")

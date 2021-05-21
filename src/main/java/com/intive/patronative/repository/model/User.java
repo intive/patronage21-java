@@ -44,9 +44,6 @@ public class User {
     @Column(name = "login", length = 32, nullable = false)
     private String login;
 
-    @Column(name = "user_name", length = 32, nullable = false)
-    private String userName;
-
     @Column(name = "first_name", length = 64, nullable = false)
     private String firstName;
 
