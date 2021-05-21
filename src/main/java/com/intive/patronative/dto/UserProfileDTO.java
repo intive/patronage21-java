@@ -1,5 +1,6 @@
 package com.intive.patronative.dto;
 
+import com.intive.patronative.dto.profile.UserStatus;
 import lombok.Builder;
 import lombok.Value;
 
@@ -17,4 +18,5 @@ public class UserProfileDTO {
     String email;
     String phoneNumber;
     String gitHubUrl;
+    UserStatus status;
 }

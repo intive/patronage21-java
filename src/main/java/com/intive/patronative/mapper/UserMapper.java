@@ -4,8 +4,10 @@ import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.model.UserDTO;
 import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.UserProfileDTO;
+import com.intive.patronative.dto.profile.UserStatus;
 import com.intive.patronative.repository.model.Profile;
 import com.intive.patronative.repository.model.Project;
+import com.intive.patronative.repository.model.Status;
 import com.intive.patronative.repository.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -49,6 +51,7 @@ public class UserMapper extends Mapper {
                         .email(user.getEmail())
                         .phoneNumber(user.getPhoneNumber())
                         .projects(projectMapper.mapToProjectDTOList(user.getProjects()))
+                        .status(Optional.ofNullable(user.getStatus()).map(Status::getName).orElse(null))
                         .build())
                 .orElse(null);
     }
