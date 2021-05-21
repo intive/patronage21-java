@@ -86,10 +86,4 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "technology_group_id"))
     private Set<TechnologyGroup> technologyGroups;
-
-    @ManyToMany
-    @JoinTable(name = "user_consent", schema = "patronative",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "consent_id"))
-    private Set<Consent> consents;
 }
