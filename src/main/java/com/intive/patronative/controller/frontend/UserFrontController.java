@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +60,18 @@ public class UserFrontController {
     })
     public ResponseEntity<Void> update(@RequestBody final UserEditDTO userEditDTO) {
         userService.updateUser(userEditDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{login}/deactivate")
+    @Operation(summary = "Deactivate user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deactivation successful"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "422", description = "Invalid login")
+    })
+    public ResponseEntity<Void> deactivateUser(@PathVariable(name = "login") final String login) {
+        userService.deactivateUserByLogin(login);
         return ResponseEntity.ok().build();
     }
 

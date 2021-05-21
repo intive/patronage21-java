@@ -1,7 +1,7 @@
 package com.intive.patronative.controller.advice;
 
+import com.intive.patronative.exception.EntityNotFoundException;
 import com.intive.patronative.exception.InvalidArgumentException;
-import com.intive.patronative.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,8 +45,8 @@ public class UserControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(UserNotFoundException.class)
-    public ValidationErrorResponse userNotFoundHandler(final UserNotFoundException exception) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ValidationErrorResponse entityNotFoundHandler(final EntityNotFoundException exception) {
         return buildErrorResponse(Collections.singletonList(exception.getFieldError()));
     }
 
