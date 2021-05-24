@@ -4,6 +4,7 @@ import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserResponseDTO;
 import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.profile.UserRole;
+import com.intive.patronative.dto.profile.UserStatus;
 import com.intive.patronative.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,9 +37,10 @@ public class UserFrontController {
                                            @RequestParam(required = false) final String lastName,
                                            @RequestParam(required = false) final String login,
                                            @RequestParam(required = false) final UserRole role,
+                                           @RequestParam(required = false) final UserStatus status,
                                            @RequestParam(required = false) final String technologyGroup,
                                            @RequestParam(required = false) final String other) {
-        return ResponseEntity.ok(userService.searchUsers(firstName, lastName, login, role, technologyGroup, other));
+        return ResponseEntity.ok(userService.searchUsers(firstName, lastName, login, role, status, technologyGroup, other));
     }
 
     @GetMapping("/{login}")

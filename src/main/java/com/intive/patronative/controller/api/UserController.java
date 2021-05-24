@@ -3,6 +3,9 @@ package com.intive.patronative.controller.api;
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserResponseDTO;
 import com.intive.patronative.dto.model.UserDTO;
+import com.intive.patronative.dto.model.UsersDTO;
+import com.intive.patronative.dto.profile.UserRole;
+import com.intive.patronative.dto.profile.UserStatus;
 import com.intive.patronative.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -27,6 +31,22 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping
+    @Operation(summary = "Search users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Search successful"),
+            @ApiResponse(responseCode = "422", description = "Invalid data passed")
+    })
+    public ResponseEntity<UsersDTO> search(@RequestParam(required = false) final String firstName,
+                                           @RequestParam(required = false) final String lastName,
+                                           @RequestParam(required = false) final String login,
+                                           @RequestParam(required = false) final UserRole role,
+                                           @RequestParam(required = false) final UserStatus status,
+                                           @RequestParam(required = false) final String technologyGroup,
+                                           @RequestParam(required = false) final String other) {
+        return ResponseEntity.ok(userService.searchUsers(firstName, lastName, login, role, status, technologyGroup, other));
+    }
 
     @GetMapping("/{login}")
     @Operation(summary = "Fetch user by login")

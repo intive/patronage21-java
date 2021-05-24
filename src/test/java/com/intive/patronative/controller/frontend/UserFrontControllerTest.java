@@ -49,7 +49,7 @@ class UserFrontControllerTest {
     @Test
     void usersFound_shouldReturnListAndStatus200() throws Exception {
         // given
-        when(userService.searchUsers(any(), any(), any(), any(), any(), any()))
+        when(userService.searchUsers(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(users);
 
         // when
@@ -59,14 +59,14 @@ class UserFrontControllerTest {
         action
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(objectMapper.writeValueAsString(users)));
-        verify(userService).searchUsers(any(), any(), any(), any(), any(), any());
+        verify(userService).searchUsers(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void usersNotFound_shouldReturnEmptyListAndStatus200() throws Exception {
         // given
         final var emptyUsers = new UsersDTO(Collections.emptyList());
-        when(userService.searchUsers(any(), any(), any(), any(), any(), any()))
+        when(userService.searchUsers(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(emptyUsers);
 
         // when
@@ -76,6 +76,7 @@ class UserFrontControllerTest {
         action
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(objectMapper.writeValueAsString(emptyUsers)));
-        verify(userService).searchUsers(any(), any(), any(), any(), any(), any());
+        verify(userService).searchUsers(any(), any(), any(), any(), any(), any(), any());
     }
+
 }

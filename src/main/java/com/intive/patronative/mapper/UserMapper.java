@@ -4,7 +4,6 @@ import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.model.UserDTO;
 import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.UserProfileDTO;
-import com.intive.patronative.dto.profile.UserStatus;
 import com.intive.patronative.repository.model.Profile;
 import com.intive.patronative.repository.model.Project;
 import com.intive.patronative.repository.model.Status;
@@ -58,12 +57,13 @@ public class UserMapper extends Mapper {
 
     public UserDTO mapEntityToUserResponse(final User user) {
         return Optional.ofNullable(user)
-                .map(u -> new UserDTO(u.getLogin(),
-                        u.getFirstName(),
-                        u.getLastName(),
-                        u.getEmail(),
-                        u.getPhoneNumber(),
-                        u.getGitHubUrl()))
+                .map(u -> UserDTO.builder()
+                        .login(u.getLogin())
+                        .firstName(u.getFirstName())
+                        .lastName(u.getLastName())
+                        .image(Optional.ofNullable(u.getProfile()).map(Profile::getImage).orElse(null))
+                        .status(Optional.ofNullable(u.getStatus()).map(Status::getName).orElse(null))
+                        .build())
                 .orElse(null);
     }
 
