@@ -1,6 +1,7 @@
 package com.intive.patronative.dto;
 
 import com.intive.patronative.dto.profile.UserRole;
+import com.intive.patronative.dto.profile.UserStatus;
 import lombok.Value;
 import org.springframework.lang.Nullable;
 
@@ -14,6 +15,8 @@ public class UserSearchDTO {
     String login;
     @Nullable
     UserRole role;
+    @Nullable
+    UserStatus status;
     @Nullable
     String technologyGroup;
     @Nullable

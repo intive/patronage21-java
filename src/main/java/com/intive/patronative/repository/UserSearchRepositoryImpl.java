@@ -1,7 +1,10 @@
 package com.intive.patronative.repository;
 
 import com.intive.patronative.dto.UserSearchDTO;
+import com.intive.patronative.dto.profile.UserRole;
+import com.intive.patronative.dto.profile.UserStatus;
 import com.intive.patronative.repository.model.Role;
+import com.intive.patronative.repository.model.Status;
 import com.intive.patronative.repository.model.TechnologyGroup;
 import com.intive.patronative.repository.model.User;
 import lombok.AllArgsConstructor;
@@ -48,7 +51,10 @@ public class UserSearchRepositoryImpl implements UserSearchRepository {
                                             final Root<User> root) {
         final List<Predicate> predicates = new ArrayList<>();
         if (userSearchDTO.getRole() != null) {
-            predicates.add(createRoleByNamePredicate(userSearchDTO.getRole().toString(), criteriaBuilder, root));
+            predicates.add(createRoleByNamePredicate(userSearchDTO.getRole(), criteriaBuilder, root));
+        }
+        if (userSearchDTO.getStatus() != null) {
+            predicates.add(createStatusByNamePredicate(userSearchDTO.getStatus(), criteriaBuilder, root));
         }
         if (userSearchDTO.getTechnologyGroup() != null) {
             predicates.add(createTechnologyGroupByNamePredicate(userSearchDTO.getTechnologyGroup(), criteriaBuilder, root));
@@ -70,10 +76,17 @@ public class UserSearchRepositoryImpl implements UserSearchRepository {
         return predicates;
     }
 
-    private Predicate createRoleByNamePredicate(final String role, final CriteriaBuilder criteriaBuilder,
+
+    private Predicate createRoleByNamePredicate(final UserRole role, final CriteriaBuilder criteriaBuilder,
                                                 final Root<User> root) {
         final Join<User, Role> roleJoin = root.join("role", JoinType.LEFT);
         return criteriaBuilder.equal(roleJoin.get("name"), role);
+    }
+
+    private Predicate createStatusByNamePredicate(final UserStatus status, final CriteriaBuilder criteriaBuilder,
+                                                  final Root<User> root) {
+        final Join<User, Status> statusJoin = root.join("status", JoinType.LEFT);
+        return criteriaBuilder.equal(statusJoin.get("name"), status);
     }
 
     private Predicate createTechnologyGroupByNamePredicate(final String technologyGroup,
@@ -121,7 +134,7 @@ public class UserSearchRepositoryImpl implements UserSearchRepository {
     }
 
     private Predicate createFirstAndLastNamePredicate(final String other, final CriteriaBuilder criteriaBuilder,
-                                                      final Root<User> root, boolean isReversed) {
+                                                      final Root<User> root, final boolean isReversed) {
         final var firstField = isReversed ? "lastName" : "firstName";
         final var secondField = isReversed ? "firstName" : "lastName";
         final Expression<String> concatenatedFieldSpaceFieldExpression =

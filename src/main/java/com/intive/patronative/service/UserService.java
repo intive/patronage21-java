@@ -59,9 +59,10 @@ public class UserService {
     }
 
     public UsersDTO searchUsers(final String firstName, final String lastName, final String login, final UserRole role,
-                                final String technologyGroup, String other) {
-        final var userSearchDTO = new UserSearchDTO(firstName, lastName, login, role, technologyGroup, other);
+                                final UserStatus status, final String technologyGroup, final String other) {
+        final var userSearchDTO = new UserSearchDTO(firstName, lastName, login, role, status, technologyGroup, other);
         userSearchValidator.validateSearchParameters(userSearchDTO);
+
         final List<User> fetchedUsers = userRepository.findAllUsers(userSearchDTO);
 
         return userMapper.mapEntitiesToUsersResponse(fetchedUsers);
@@ -76,7 +77,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private User getUserFromDatabaseByLogin(String login) {
+    private User getUserFromDatabaseByLogin(final String login) {
         if (!UserValidator.isLoginValid(login)) {
             throw new InvalidArgumentException("login", login);
         }
