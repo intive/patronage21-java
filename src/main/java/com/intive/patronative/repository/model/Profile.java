@@ -4,10 +4,12 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 
@@ -24,6 +26,8 @@ public class Profile {
     @Column(name = "bio", length = 512)
     private String bio;
 
+    @Lob
+    @Type(type="org.hibernate.type.BinaryType")
     @Column(name = "image")
     private byte[] image;
 }

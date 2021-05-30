@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.intive.patronative.validation.ValidationHelper.getFieldError;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Component
 public class UserValidator {
@@ -31,6 +36,7 @@ public class UserValidator {
     private static final int MAX_BIO_LENGTH_IN_DATABASE = 512;
     private static final String BASE_GITHUB_LINK = "github.com/";
     private static final String FULL_GITHUB_LINK = "https://www.github.com/";
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("image/png", "image/jpeg", "image/gif");
 
     private static final Matcher FIRST_NAME_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]+").matcher("");
     private static final Matcher LAST_NAME_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]+([- ][a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]+)?$")
@@ -77,6 +83,14 @@ public class UserValidator {
 
         if (!fieldErrors.isEmpty()) {
             throw new InvalidArgumentException(fieldErrors);
+        }
+    }
+
+    public void validateUserImage(final MultipartFile image) {
+        final var fieldError = checkImage(image);
+
+        if (!isNull(fieldError)) {
+            throw new InvalidArgumentException(List.of(fieldError));
         }
     }
 
@@ -227,6 +241,23 @@ public class UserValidator {
         return (projects == null) || (projects.size() <= projectsParticipationLimit)
                 ? null
                 : ValidationHelper.getFieldError("projects", "", projectMaxParticipationMessage + projectsParticipationLimit);
+    }
+
+    private FieldError checkImage(final MultipartFile image) {
+        final var allowedImageFormatsMessage = "Allowed image formats: " + ALLOWED_IMAGE_TYPES.toString();
+        final var imageNotFoundMessage = "No image was sent";
+
+        if (isNull(image)) {
+            return ValidationHelper.getFieldError("image", null, imageNotFoundMessage);
+        }
+
+        return isImageValid(image)
+                ? null
+                : ValidationHelper.getFieldError("image", image.getContentType(), allowedImageFormatsMessage);
+    }
+
+    public static boolean isImageValid(final MultipartFile image) {
+        return nonNull(image) && ALLOWED_IMAGE_TYPES.contains(image.getContentType());
     }
 
 }

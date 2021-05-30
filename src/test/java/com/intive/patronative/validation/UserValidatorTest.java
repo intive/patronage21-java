@@ -7,7 +7,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.stream.Stream;
@@ -70,6 +73,26 @@ class UserValidatorTest {
     @MethodSource("invalidLogin")
     void isLoginValid_shouldReturnFalse(final String login) {
         assertFalse(userValidator.isLoginValid(login));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validImage")
+    void isImageValid_shouldReturnTrue(final MultipartFile image) {
+        //when
+        final var imageValid = UserValidator.isImageValid(image);
+
+        //then
+        assertTrue(imageValid);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidImage")
+    void isImageValid_shouldReturnFalse(final MultipartFile image) {
+        //when
+        final var imageValid = UserValidator.isImageValid(image);
+
+        //then
+        assertFalse(imageValid);
     }
 
     private static Stream<String> validFirstNames() {
@@ -166,6 +189,35 @@ class UserValidatorTest {
                 new UserEditDTO(null, "łukasz", "śmith-zerga", null, "48123456789", "https://github.com/-user-name-1234",
                         "bio", Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build()))
         );
+    }
+
+    private static Stream<MultipartFile> validImage() {
+        return Stream.of(
+                createMultiPartFile("image", "image.jpg", MediaType.IMAGE_JPEG_VALUE),
+                createMultiPartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE),
+                createMultiPartFile("photo", "photo.png", MediaType.IMAGE_PNG_VALUE),
+                createMultiPartFile("photo", "photo.txt", MediaType.IMAGE_PNG_VALUE),
+                createMultiPartFile("PHOTO", "PHOTO.PNG", MediaType.IMAGE_PNG_VALUE),
+                createMultiPartFile("picture", "logo.gif", MediaType.IMAGE_GIF_VALUE)
+        );
+    }
+
+    private static Stream<MultipartFile> invalidImage() {
+        return Stream.of(
+                createMultiPartFile("image", "image.drawio", MediaType.APPLICATION_CBOR_VALUE),
+                createMultiPartFile("image", "image.jpeg", MediaType.APPLICATION_PDF_VALUE),
+                createMultiPartFile("photo", "photo.png", MediaType.APPLICATION_XML_VALUE),
+                createMultiPartFile("photo", "photo.txt", MediaType.TEXT_PLAIN_VALUE),
+                null
+        );
+    }
+
+    private static MultipartFile createMultiPartFile(final String name, final String originalName, final String mediaType) {
+        return new MockMultipartFile(
+                name,
+                originalName,
+                mediaType,
+                new byte[1024 * 60]);
     }
 
 }
