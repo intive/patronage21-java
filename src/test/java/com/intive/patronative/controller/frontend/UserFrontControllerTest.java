@@ -10,15 +10,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -78,5 +82,26 @@ class UserFrontControllerTest {
                 .andExpect(content().string(objectMapper.writeValueAsString(emptyUsers)));
         verify(userService).searchUsers(any(), any(), any(), any(), any(), any(), any());
     }
+
+    @Test
+    void correctImageSize_shouldReturnStatus200() throws Exception {
+        // given
+        final var image
+                = new MockMultipartFile(
+                "image",
+                "image.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                new byte[1024 * 60]
+        );
+
+        // when
+        final var action = mvc.perform(multipart("/frontend-api/users/{login}/image", "AnnaNowak").file(image));
+
+        // then
+        action
+                .andExpect(status().is2xxSuccessful());
+        verify(userService).uploadImage(eq("AnnaNowak"), eq(image));
+    }
+
 
 }
