@@ -80,18 +80,6 @@ public class UserFrontController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{login}/image")
-    @Operation(summary = "Delete user's image")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Image removed"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "422", description = "Invalid login")
-    })
-    public ResponseEntity<Void> deleteImage(@PathVariable(name = "login") final String login) {
-        userService.deleteImage(login);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/{login}/image")
     @Operation(summary = "Upload user profile image")
     @ApiResponses(value = {
@@ -101,6 +89,30 @@ public class UserFrontController {
     })
     public ResponseEntity<Void> uploadImage(@PathVariable(name = "login") final String login, @RequestParam(required = false) final MultipartFile image) {
         userService.uploadImage(login, image);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{login}/image")
+    @Operation(summary = "Update user profile image")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Image uploaded"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "422", description = "Invalid login or image")
+    })
+    public ResponseEntity<Void> updateImage(@PathVariable(name = "login") final String login, @RequestParam(required = false) final MultipartFile image) {
+        userService.uploadImage(login, image);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{login}/image")
+    @Operation(summary = "Delete user's image")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Image removed"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "422", description = "Invalid login")
+    })
+    public ResponseEntity<Void> deleteImage(@PathVariable(name = "login") final String login) {
+        userService.deleteImage(login);
         return ResponseEntity.ok().build();
     }
 }
