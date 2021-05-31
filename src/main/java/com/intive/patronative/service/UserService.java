@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Calendar;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -70,6 +72,16 @@ public class UserService {
 
     public UserResponseDTO getUserByLogin(final String login) {
         return new UserResponseDTO(userMapper.mapToUserProfileDTO(getUserFromDatabaseByLogin(login)));
+    }
+
+    public void deleteImage(final String login) {
+        final var user = getUserFromDatabaseByLogin(login);
+
+        if (nonNull(user.getProfile()) && nonNull(user.getProfile().getImage())) {
+            user.getProfile().setImage(null);
+
+            storeUserInDatabase(user);
+        }
     }
 
     @Transactional

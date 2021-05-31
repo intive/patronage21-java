@@ -118,6 +118,15 @@ class UserServiceTest {
         assertThrows(InvalidArgumentException.class, () -> userService.deactivateUserByLogin(login));
     }
 
+    @ParameterizedTest
+    @MethodSource("usersFromDatabase")
+    void deleteImage_shouldNotThrow(final User user) {
+        // when
+        Mockito.when(userRepository.findByLogin(Mockito.anyString())).thenReturn(Optional.ofNullable(user));
+        // then
+        assertDoesNotThrow(() -> userService.deleteImage("AnnaNowak"));
+    }
+
     private static Stream<UserEditDTO> validUserData() {
         return Stream.of(
                 new UserEditDTO("login", "firstName", "lastName", "email@mail.pl", "123456789", "https://github.com/username",
@@ -145,6 +154,13 @@ class UserServiceTest {
 
     private static Stream<String> validLogin() {
         return Stream.of("AnnaNowak", "ValidLogin123");
+    }
+
+    private static Stream<User> usersFromDatabase() {
+        return Stream.of(
+                User.builder().profile(null).build(),
+                User.builder().profile(new Profile()).build()
+        );
     }
 
     private User exampleUser() {
