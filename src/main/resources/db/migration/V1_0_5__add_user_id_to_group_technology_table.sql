@@ -1,0 +1,1 @@
+alter table patronative.group_technology add user_id NUMERIC(19, 0) REFERENCES patronative.user (id);
