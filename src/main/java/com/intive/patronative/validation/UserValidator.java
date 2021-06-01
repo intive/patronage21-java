@@ -3,8 +3,8 @@ package com.intive.patronative.validation;
 import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
@@ -12,171 +12,221 @@ import org.springframework.validation.FieldError;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserValidator {
 
-    @Value("${validators.user.projects.maximum-participation}")
-    private int projectsParticipationLimit;
-
-    private static final int BIO_LENGTH = 512;
-    private static final int PHONE_NUMBER_LENGTH = 9;
-    private static final int MIN_NAME_LENGTH = 2;
-    private static final int MAX_NAME_LENGTH = 30;
-    private static final int MIN_LOGIN_LENGTH = 2;
-    private static final int MAX_LOGIN_LENGTH = 15;
-    private static final int MIN_EMAIL_USERNAME_LENGTH = 3;
-    private static final int MAX_EMAIL_USERNAME_LENGTH = 30;
-    private static final int MIN_GITHUB_USERNAME_LENGTH = 4;
-    private static final int MAX_GITHUB_USERNAME_LENGTH = 39;
-    private static final int MIN_OTHER_LENGTH = 2;
-    private static final int MAX_OTHER_LENGTH = 125;
+    private static final int MAX_LOGIN_LENGTH_IN_DATABASE = 32;
+    private static final int MAX_FIRST_NAME_LENGTH_IN_DATABASE = 64;
+    private static final int MAX_LAST_NAME_LENGTH_IN_DATABASE = 64;
+    private static final int MAX_EMAIL_LENGTH_IN_DATABASE = 64;
+    private static final int MAX_PHONE_NUMBER_LENGTH_IN_DATABASE = 16;
+    private static final int MAX_GITHUB_URL_LENGTH_IN_DATABASE = 256;
+    private static final int MAX_BIO_LENGTH_IN_DATABASE = 512;
     private static final String BASE_GITHUB_LINK = "github.com/";
     private static final String FULL_GITHUB_LINK = "https://www.github.com/";
 
-    private static final Pattern FIRST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{" + MIN_NAME_LENGTH +
-            "," + MAX_NAME_LENGTH + "}$");
-    private static final Pattern LAST_NAME_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{" + MIN_NAME_LENGTH +
-            "," + MAX_NAME_LENGTH + "}([- ][a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]{" + MIN_NAME_LENGTH + "," + MAX_NAME_LENGTH + "})?$");
-    private static final Pattern LOGIN_PATTERN = Pattern.compile("^[a-zA-Z0-9]{" + MIN_LOGIN_LENGTH + "," + MAX_LOGIN_LENGTH + "}$");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9.]{" + MIN_EMAIL_USERNAME_LENGTH +
-            "," + MAX_EMAIL_USERNAME_LENGTH + "}+[@][a-zA-Z]{1,15}[.][a-z]{1,5}$");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{" + PHONE_NUMBER_LENGTH + "}$");
-    private static final Pattern GITHUB_PATTERN = Pattern.compile("^(https?://)?(www.)?" + BASE_GITHUB_LINK +
-            "[a-zA-Z0-9](?:[a-zA-Z\\d]|-(?=[a-zA-Z\\d])){" + (MIN_GITHUB_USERNAME_LENGTH - 1) + "," + (MAX_GITHUB_USERNAME_LENGTH - 1) + "}$");
-    private static final Pattern OTHER_PATTERN = Pattern.compile(
-            "^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9 -]" + "{" + MIN_OTHER_LENGTH + "," + MAX_OTHER_LENGTH + "}$");
-    private static final Pattern TECHNOLOGY_GROUP_PATTERN = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9() -]+$");
+    private static final Matcher FIRST_NAME_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]+").matcher("");
+    private static final Matcher LAST_NAME_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]+([- ][a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż]+)?$")
+            .matcher("");
+    private static final Matcher LOGIN_MATCHER = Pattern.compile("^[a-zA-Z0-9]+$").matcher("");
+    private static final Matcher EMAIL_USERNAME_MATCHER = Pattern.compile("^[a-zA-Z0-9.]+$").matcher("");
+    private static final Matcher EMAIL_BASE_MATCHER = Pattern.compile("^@[a-zA-Z]{1,15}[.][a-z]{1,5}$").matcher("");
+    private static final Matcher PHONE_MATCHER = Pattern.compile("^[0-9]+$").matcher("");
+    private static final Matcher GITHUB_USERNAME_MATCHER = Pattern.compile("^[a-zA-Z0-9]+([- ][a-zA-Z0-9]+)*$")
+            .matcher("");
+    private static final Matcher GITHUB_LINK_MATCHER = Pattern.compile("^(https?://)?(www.)?" + BASE_GITHUB_LINK + "$")
+            .matcher("");
 
-    private static final String FIRST_NAME_MESSAGE = "Only letters, " + MIN_NAME_LENGTH + " to " + MAX_NAME_LENGTH + " letters";
-    private static final String LAST_NAME_MESSAGE = "Only letters, dash or space allowed for two part surnames, each surname " +
-            MIN_NAME_LENGTH + " to " + MAX_NAME_LENGTH + " letters";
-    private static final String LOGIN_MESSAGE = "Letters and numbers, " + MIN_LOGIN_LENGTH + " to " + MAX_LOGIN_LENGTH + " characters";
-    private static final String EMAIL_MESSAGE = "Example e-mail: example.Mail123@mail.com, username part " + MIN_EMAIL_USERNAME_LENGTH +
-            " to " + MAX_EMAIL_USERNAME_LENGTH + " characters";
-    private static final String PHONE_MESSAGE = PHONE_NUMBER_LENGTH + " digits required";
-    private static final String GITHUB_MESSAGE = "Letters, numbers and dashes allowed, username minimum " + MIN_GITHUB_USERNAME_LENGTH +
-            " characters, should start with " + FULL_GITHUB_LINK + ", username cannot start or end with dash, username cannot exceed " +
-            MAX_GITHUB_USERNAME_LENGTH;
-    private static final String BIO_MESSAGE = "Bio up to " + BIO_LENGTH + " characters";
-    private static final String PROJECT_MAX_PARTICIPATION_MESSAGE = "Maximum number of projects in which you can participate is: ";
+    @Value("${validators.user.phone-number.length}")
+    private int phoneNumberLength;
+    @Value("${validators.user.first-name.length.min}")
+    private int minFirstNameLength;
+    @Getter(AccessLevel.PACKAGE)
+    @Value("${validators.user.first-name.length.max}")
+    private int maxFirstNameLength;
+    @Value("${validators.user.last-name.length.min}")
+    private int minLastNameLength;
+    @Getter(AccessLevel.PACKAGE)
+    @Value("${validators.user.last-name.length.max}")
+    private int maxLastNameLength;
+    @Value("${validators.user.login.length.min}")
+    private int minLoginLength;
+    @Getter(AccessLevel.PACKAGE)
+    @Value("${validators.user.login.length.max}")
+    private int maxLoginLength;
+    @Value("${validators.user.email-username.length.min}")
+    private int minEmailUsernameLength;
+    @Value("${validators.user.email-username.length.max}")
+    private int maxEmailUsernameLength;
+    @Value("${validators.user.github-username.length.min}")
+    private int minGithubUsernameLength;
+    @Value("${validators.user.github-username.length.max}")
+    private int maxGithubUsernameLength;
+    @Value("${validators.user.projects.maximum-participation}")
+    private int projectsParticipationLimit;
 
-    public void validateUserData(final UserEditDTO userDTO) {
-        final var fieldErrors = getFieldErrors(userDTO);
+    public void validateUserData(final UserEditDTO userEditDTO) throws InvalidArgumentException {
+        final var fieldErrors = getFieldErrors(userEditDTO);
 
         if (!fieldErrors.isEmpty()) {
             throw new InvalidArgumentException(fieldErrors);
         }
     }
 
-    public static boolean isFirstNameValid(final String firstName) {
-        return (firstName != null) && FIRST_NAME_PATTERN.matcher(firstName).matches();
-    }
-
-    public static boolean isLastNameValid(final String lastName) {
-        return (lastName != null) && LAST_NAME_PATTERN.matcher(lastName).matches();
-    }
-
-    public static boolean isLoginValid(final String login) {
-        return (login != null) && LOGIN_PATTERN.matcher(login).matches();
-    }
-
-    public static boolean isEmailValid(final String email) {
-        return (email != null) && EMAIL_PATTERN.matcher(email).matches();
-    }
-
-    public static boolean isPhoneValid(final String phone) {
-        return (phone != null) && PHONE_PATTERN.matcher(phone).matches();
-    }
-
-    public static boolean isGithubValid(final String github) {
-        return (github != null) && (GITHUB_PATTERN.matcher(github).matches());
-    }
-
-    public static boolean isBioValid(final String bio) {
-        return (bio != null) && (bio.length() <= BIO_LENGTH);
-    }
-
-    public static boolean isOtherValid(final String other) {
-        return (other != null) && OTHER_PATTERN.matcher(other).matches();
-    }
-
-    public static boolean isTechnologyGroupValid(final String technologyGroup) {
-        return (technologyGroup != null) && TECHNOLOGY_GROUP_PATTERN.matcher(technologyGroup).matches();
-    }
-
     private List<FieldError> getFieldErrors(final UserEditDTO userEditDTO) {
-        if (userEditDTO != null) {
-            return Stream.of(checkLogin(userEditDTO.getLogin()),
-                    checkFirstName(userEditDTO.getFirstName()),
-                    checkLastName(userEditDTO.getLastName()),
-                    checkEmail(userEditDTO.getEmail()),
-                    checkPhone(userEditDTO.getPhoneNumber()),
-                    checkGithub(userEditDTO.getGitHubUrl()),
-                    checkBio(userEditDTO.getBio()),
-                    checkProjects(userEditDTO.getProjects()))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
+        return Optional.ofNullable(userEditDTO)
+                .map(user -> Stream
+                        .of(checkLogin(user.getLogin()),
+                                checkFirstName(user.getFirstName()),
+                                checkLastName(user.getLastName()),
+                                checkEmail(user.getEmail()),
+                                checkPhone(user.getPhoneNumber()),
+                                checkGithub(user.getGitHubUrl()),
+                                checkBio(user.getBio()),
+                                checkProjects(user.getProjects()))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     private FieldError checkLogin(final String login) {
-        return (login == null) || (isLoginValid(login))
+        final var loginMessage = "Letters and numbers, " + ValidationHelper.getMinMaxCharactersMessage(minLoginLength, maxLoginLength);
+
+        return (login == null) || (ValidationHelper.checkLength(login, minLoginLength, maxLoginLength)
+                && (isLoginValid(login)))
                 ? null
-                : getFieldError("login", login, LOGIN_MESSAGE);
+                : ValidationHelper.getFieldError("login", login, loginMessage);
+    }
+
+    public boolean isLoginValid(final String login) {
+        return (login != null) && (login.length() <= MAX_LOGIN_LENGTH_IN_DATABASE)
+                && LOGIN_MATCHER.reset(login).matches();
     }
 
     private FieldError checkFirstName(final String firstName) {
-        return (firstName == null) || (isFirstNameValid(firstName))
+        final var firstNameMessage = "Only letters, " +
+                ValidationHelper.getMinMaxCharactersMessage(minFirstNameLength, maxFirstNameLength);
+
+        return (firstName == null) || (ValidationHelper.checkLength(firstName, minFirstNameLength, maxFirstNameLength)
+                && (isFirstNameValid(firstName)))
                 ? null
-                : getFieldError("firstName", firstName, FIRST_NAME_MESSAGE);
+                : ValidationHelper.getFieldError("firstName", firstName, firstNameMessage);
+    }
+
+    public boolean isFirstNameValid(final String firstName) {
+        return (firstName != null) && (firstName.length() <= MAX_FIRST_NAME_LENGTH_IN_DATABASE)
+                && FIRST_NAME_MATCHER.reset(firstName).matches();
     }
 
     private FieldError checkLastName(final String lastName) {
-        return (lastName == null) || (isLastNameValid(lastName))
+        final var lastNameMessage = "Only letters, dash or space allowed for two part surnames, each surname " +
+                ValidationHelper.getMinMaxCharactersMessage(minLastNameLength, maxLastNameLength);
+
+        return (lastName == null) || (ValidationHelper.checkLength(lastName, minLastNameLength, maxLastNameLength)
+                && (isLastNameValid(lastName)))
                 ? null
-                : getFieldError("lastName", lastName, LAST_NAME_MESSAGE);
+                : ValidationHelper.getFieldError("lastName", lastName, lastNameMessage);
+    }
+
+    public boolean isLastNameValid(final String lastName) {
+        return (lastName != null) && (lastName.length() <= MAX_LAST_NAME_LENGTH_IN_DATABASE)
+                && LAST_NAME_MATCHER.reset(lastName).matches();
     }
 
     private FieldError checkEmail(final String email) {
+        final var emailMessage = "Example e-mail: example.Mail123@mail.com, username part " +
+                ValidationHelper.getMinMaxCharactersMessage(minEmailUsernameLength, maxEmailUsernameLength);
+
         return (email == null) || (isEmailValid(email))
                 ? null
-                : getFieldError("email", email, EMAIL_MESSAGE);
+                : ValidationHelper.getFieldError("email", email, emailMessage);
+    }
+
+    private boolean isEmailValid(final String email) {
+        if (email != null) {
+            final var splitEmailByAt = email.split("(?=@)");
+
+            if (splitEmailByAt.length == 2) {
+                final var emailUsername = splitEmailByAt[0];
+                final var emailBase = splitEmailByAt[1];
+
+                return (email.length() <= MAX_EMAIL_LENGTH_IN_DATABASE)
+                        && ValidationHelper.checkLength(emailUsername, minEmailUsernameLength, maxEmailUsernameLength)
+                        && EMAIL_USERNAME_MATCHER.reset(emailUsername).matches()
+                        && EMAIL_BASE_MATCHER.reset(emailBase).matches();
+            }
+        }
+
+        return false;
     }
 
     private FieldError checkPhone(final String phone) {
+        final var phoneMessage = phoneNumberLength + " digits required";
+
         return (phone == null) || (isPhoneValid(phone))
                 ? null
-                : getFieldError("phone", phone, PHONE_MESSAGE);
+                : ValidationHelper.getFieldError("phone", phone, phoneMessage);
+    }
+
+    private boolean isPhoneValid(final String phone) {
+        return (phone != null) && (phone.length() <= MAX_PHONE_NUMBER_LENGTH_IN_DATABASE)
+                && ValidationHelper.checkLength(phone, phoneNumberLength, phoneNumberLength)
+                && PHONE_MATCHER.reset(phone).matches();
     }
 
     private FieldError checkGithub(final String github) {
+        final var githubMessage = "Letters, numbers and dashes allowed, username minimum " + minGithubUsernameLength +
+                " characters, should start with " + FULL_GITHUB_LINK + ", username cannot start or end with dash, username cannot exceed " +
+                maxGithubUsernameLength;
+
         return (github == null) || (isGithubValid(github))
                 ? null
-                : getFieldError("github", github, GITHUB_MESSAGE);
+                : ValidationHelper.getFieldError("github", github, githubMessage);
+    }
+
+    private boolean isGithubValid(final String github) {
+        if (github != null) {
+            final var splitGithubByBaseLink = github.split("(?<=" + BASE_GITHUB_LINK + ")");
+
+            if (splitGithubByBaseLink.length == 2) {
+                final var githubLink = splitGithubByBaseLink[0];
+                final var githubUsername = splitGithubByBaseLink[1];
+
+                return (github.length() <= MAX_GITHUB_URL_LENGTH_IN_DATABASE)
+                        && ValidationHelper.checkLength(githubUsername, minGithubUsernameLength, maxGithubUsernameLength)
+                        && GITHUB_USERNAME_MATCHER.reset(githubUsername).matches()
+                        && GITHUB_LINK_MATCHER.reset(githubLink).matches();
+            }
+        }
+
+        return false;
     }
 
     private FieldError checkBio(final String bio) {
+        final var bioMessage = "Up to " + MAX_BIO_LENGTH_IN_DATABASE + " characters";
+
         return (bio == null) || (isBioValid(bio))
                 ? null
-                : getFieldError("bio", bio, BIO_MESSAGE);
+                : ValidationHelper.getFieldError("bio", bio, bioMessage);
+    }
+
+    private boolean isBioValid(final String bio) {
+        return (bio != null) && (bio.length() <= MAX_BIO_LENGTH_IN_DATABASE);
     }
 
     private FieldError checkProjects(final Set<ProjectDTO> projects) {
+        final var projectMaxParticipationMessage = "Maximum number of projects in which you can participate is: ";
+
         return (projects == null) || (projects.size() <= projectsParticipationLimit)
                 ? null
-                : getFieldError("projects", "", PROJECT_MAX_PARTICIPATION_MESSAGE + projectsParticipationLimit);
-    }
-
-    private FieldError getFieldError(final String fieldName, final String fieldValue, final String message) {
-        return new FieldError("String", fieldName, fieldValue, false, null, null, message);
+                : ValidationHelper.getFieldError("projects", "", projectMaxParticipationMessage + projectsParticipationLimit);
     }
 
 }

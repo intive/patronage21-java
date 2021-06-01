@@ -43,7 +43,7 @@ public class ProjectMapper {
                 .orElse(null);
     }
 
-    private Optional<ProjectRole> getProjectRole(Project project) {
+    private Optional<ProjectRole> getProjectRole(final Project project) {
         return Optional.ofNullable(project)
                 .map(Project::getProjectRoles)
                 .flatMap(projectRoles -> projectRoles.stream().findAny());

@@ -6,17 +6,21 @@ import com.intive.patronative.dto.profile.UserStatus;
 import com.intive.patronative.exception.InvalidArgumentException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
+@ContextConfiguration(classes = {UserValidator.class, UserSearchValidator.class})
 class UserSearchValidatorTest {
 
-    private final int userSearchDataMinLength = 2;
-    private final int userSearchDataMaxLength = 125;
-    private final UserSearchValidator userSearchValidator = new UserSearchValidator(userSearchDataMinLength, userSearchDataMaxLength);
+    @Autowired
+    private UserSearchValidator userSearchValidator;
 
     @ParameterizedTest
     @MethodSource("validSearchData")
@@ -35,6 +39,12 @@ class UserSearchValidatorTest {
         return Stream.of(
                 null,
                 new UserSearchDTO(null, null, null, null, null, null, null),
+                new UserSearchDTO(null, null, null, null, null, null, "lucas"),
+                new UserSearchDTO(null, null, null, null, null, null, "lucas123"),
+                new UserSearchDTO(null, null, null, null, null, null, "Johnnie-walker"),
+                new UserSearchDTO(null, null, null, null, null, null, "Luciano Cruz-Coke Carvallo"),
+                new UserSearchDTO(null, null, null, null, null, null, "Luciano Cruz-Coke Carvallo"),
+                new UserSearchDTO(null, null, null, null, null, null, " Lucas"),
                 new UserSearchDTO("Lucas", null, null, null, null, null, null),
                 new UserSearchDTO(null, "Smith", null, null, null, null, null),
                 new UserSearchDTO(null, null, "lSmith", null, null, null, null),
@@ -60,6 +70,10 @@ class UserSearchValidatorTest {
 
     private static Stream<UserSearchDTO> invalidSearchData() {
         return Stream.of(
+                new UserSearchDTO(null, null, null, null, null, null, ""),
+                new UserSearchDTO(null, null, null, null, null, null, "H"),
+                new UserSearchDTO(null, null, null, null, null, null, "Bob*the*builder"),
+                new UserSearchDTO(null, null, null, null, null, null, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porta lorem quis tristique tempus. Morbi sit amet dui nulla. Phasellus"),
                 new UserSearchDTO("Lucas123", null, null, null, null, null, null),
                 new UserSearchDTO(null, " Smith", null, UserRole.valueOf("LEADER"), null, null, null),
                 new UserSearchDTO(null, "Smith ", null, UserRole.valueOf("CANDIDATE"), null, null, null),
