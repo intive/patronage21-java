@@ -1,5 +1,6 @@
 package com.intive.patronative.validation;
 
+import com.intive.patronative.config.LocaleConfig;
 import com.intive.patronative.dto.UserSearchDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
 import lombok.RequiredArgsConstructor;
@@ -62,8 +63,8 @@ public class UserSearchValidator {
     }
 
     private FieldError checkLogin(final String login) {
-        final var loginMessage = "Letters and numbers, " +
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLoginLength());
+        final var loginMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLoginMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLoginLength()));
 
         return ((login == null) || (ValidationHelper.checkLength(login, minSearchDataLength, userValidator.getMaxLoginLength())
                 && userValidator.isLoginValid(login)))
@@ -72,8 +73,8 @@ public class UserSearchValidator {
     }
 
     private FieldError checkFirstName(final String firstName) {
-        final var firstNameMessage = "Letters only, capital and Polish letters allowed, " +
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxFirstNameLength());
+        final var firstNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationFirstNameMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxFirstNameLength()));
 
         return ((firstName == null) || (ValidationHelper.checkLength(firstName, minSearchDataLength, userValidator.getMaxFirstNameLength())
                 && userValidator.isFirstNameValid(firstName)))
@@ -82,8 +83,8 @@ public class UserSearchValidator {
     }
 
     private FieldError checkLastName(final String lastName) {
-        final var lastNameMessage = "Letters only, capital and Polish letters allowed, either dash or space in case of two-part surname, "
-                + ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLastNameLength());
+        final var lastNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLastNameMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLastNameLength()));
 
         return ((lastName == null) || (ValidationHelper.checkLength(lastName, minSearchDataLength, userValidator.getMaxLastNameLength())
                 && userValidator.isLastNameValid(lastName)))
@@ -92,8 +93,8 @@ public class UserSearchValidator {
     }
 
     private FieldError checkOther(final String other) {
-        final var otherMessage = "Letters, spaces, numbers and dashes allowed, " +
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, maxOtherLength);
+        final var otherMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationOtherMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, maxOtherLength));
 
         return ((other == null) || (ValidationHelper.checkLength(other, minSearchDataLength, maxOtherLength)
                 && isOtherValid(other)))
@@ -106,8 +107,8 @@ public class UserSearchValidator {
     }
 
     private FieldError checkTechnologyGroup(final String technologyGroup) {
-        final var technologyGroupMessage = "Letters or numbers, dash/space/parentheses allowed, " +
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH);
+        final var technologyGroupMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationTechnologyGroupMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH));
 
         return ((technologyGroup == null) || (ValidationHelper.checkLength(technologyGroup, minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH)
                 && isTechnologyGroupValid(technologyGroup)))

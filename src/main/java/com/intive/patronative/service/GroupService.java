@@ -22,7 +22,6 @@ public class GroupService {
     private final TechnologyGroupRepository groupRepository;
 
     public GroupsDTO getGroups() {
-        log.info("Called getGroups");
         final var groups = groupRepository.findAll().stream()
                 .map(TechnologyGroup::getName)
                 .collect(Collectors.toList());

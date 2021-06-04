@@ -1,5 +1,6 @@
 package com.intive.patronative.validation;
 
+import com.intive.patronative.config.LocaleConfig;
 import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
@@ -133,7 +134,8 @@ public class UserValidator {
     }
 
     private FieldError checkLogin(final String login, final boolean isRequired) {
-        final var loginMessage = "Letters and numbers, " + ValidationHelper.getMinMaxCharactersMessage(minLoginLength, maxLoginLength);
+        final var loginMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLoginMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minLoginLength, maxLoginLength));
 
         return (isRequired || login != null) && !(ValidationHelper.checkLength(login, minLoginLength, maxLoginLength) && isLoginValid(login))
                 ? ValidationHelper.getFieldError("login", login, loginMessage)
@@ -146,8 +148,8 @@ public class UserValidator {
     }
 
     private FieldError checkFirstName(final String firstName, final boolean isRequired) {
-        final var firstNameMessage = "Only letters, " +
-                ValidationHelper.getMinMaxCharactersMessage(minFirstNameLength, maxFirstNameLength);
+        final var firstNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationFirstNameMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minFirstNameLength, maxFirstNameLength));
 
         return (isRequired || firstName != null) && !(ValidationHelper.checkLength(firstName, minFirstNameLength, maxFirstNameLength) && isFirstNameValid(firstName))
                 ? ValidationHelper.getFieldError("firstName", firstName, firstNameMessage)
@@ -160,8 +162,8 @@ public class UserValidator {
     }
 
     private FieldError checkLastName(final String lastName, final boolean isRequired) {
-        final var lastNameMessage = "Only letters, dash or space allowed for two part surnames, each surname " +
-                ValidationHelper.getMinMaxCharactersMessage(minLastNameLength, maxLastNameLength);
+        final var lastNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLastNameMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minLastNameLength, maxLastNameLength));
 
         return (isRequired || lastName != null) && !(ValidationHelper.checkLength(lastName, minLastNameLength, maxLastNameLength) && isLastNameValid(lastName))
                 ? ValidationHelper.getFieldError("lastName", lastName, lastNameMessage)
@@ -174,8 +176,8 @@ public class UserValidator {
     }
 
     private FieldError checkEmail(final String email, final boolean isRequired) {
-        final var emailMessage = "Example e-mail: example.Mail123@mail.com, username part " +
-                ValidationHelper.getMinMaxCharactersMessage(minEmailUsernameLength, maxEmailUsernameLength);
+        final var emailMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationEmailMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minEmailUsernameLength, maxEmailUsernameLength));
 
         return (isRequired || email != null) && !isEmailValid(email)
                 ? ValidationHelper.getFieldError("email", email, emailMessage)
@@ -201,7 +203,8 @@ public class UserValidator {
     }
 
     private FieldError checkPhone(final String phone, final boolean isRequired) {
-        final var phoneMessage = phoneNumberLength + " digits required";
+        final var phoneMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationPhoneMessage"),
+                phoneNumberLength);
 
         return (isRequired || phone != null) && !isPhoneValid(phone)
                 ? ValidationHelper.getFieldError("phone", phone, phoneMessage)
@@ -215,9 +218,9 @@ public class UserValidator {
     }
 
     private FieldError checkGithub(final String github, final boolean isRequired) {
-        final var githubMessage = "Letters, numbers and dashes allowed, username minimum " + minGithubUsernameLength +
-                " characters, should start with " + FULL_GITHUB_LINK + ", username cannot start or end with dash, username cannot exceed " +
-                maxGithubUsernameLength;
+        final var githubMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationGithubMessage"),
+                ValidationHelper.getMinMaxCharactersMessage(minGithubUsernameLength, maxGithubUsernameLength),
+                FULL_GITHUB_LINK);
 
         return (isRequired || github != null) && !isGithubValid(github)
                 ? ValidationHelper.getFieldError("github", github, githubMessage)
@@ -243,7 +246,8 @@ public class UserValidator {
     }
 
     private FieldError checkBio(final String bio, final boolean isRequired) {
-        final var bioMessage = "Up to " + MAX_BIO_LENGTH_IN_DATABASE + " characters";
+        final var bioMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationBioMessage"),
+                MAX_BIO_LENGTH_IN_DATABASE);
 
         return (isRequired || bio != null) && !isBioValid(bio)
                 ? ValidationHelper.getFieldError("bio", bio, bioMessage)
@@ -255,7 +259,8 @@ public class UserValidator {
     }
 
     private FieldError checkProjects(final Set<ProjectDTO> projects) {
-        final var projectMaxParticipationMessage = "Maximum number of projects in which you can participate is: ";
+        final var projectMaxParticipationMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationProjectsMessage"),
+                projectsParticipationLimit);
 
         return (projects == null) || (projects.size() <= projectsParticipationLimit)
                 ? null
@@ -263,8 +268,9 @@ public class UserValidator {
     }
 
     private FieldError checkImage(final MultipartFile image) {
-        final var allowedImageFormatsMessage = "Allowed image formats: " + ALLOWED_IMAGE_TYPES.toString();
-        final var imageNotFoundMessage = "No image was sent";
+        final var allowedImageFormatsMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationImageFormatMessage"),
+                ALLOWED_IMAGE_TYPES.toString());
+        final var imageNotFoundMessage = LocaleConfig.getLocaleMessage("validationImageNotSentMessage");
 
         if (isNull(image)) {
             return ValidationHelper.getFieldError("image", null, imageNotFoundMessage);
