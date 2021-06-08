@@ -2,115 +2,70 @@ package com.intive.patronative.mapper;
 
 import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.repository.model.Project;
+import com.intive.patronative.repository.model.ProjectRole;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ProjectMapperTest {
 
     private final ProjectMapper projectMapper = new ProjectMapper();
 
     @ParameterizedTest
-    @MethodSource("toProjectSet_dataCausingEmptyOptional")
-    void toProjectSet_shouldReturnEmptyOptional(final Set<ProjectDTO> projectsDTO, final Set<Project> entityProjects) {
-        assertEquals(Optional.empty(), projectMapper.mapToProjectSet(projectsDTO, entityProjects));
+    @MethodSource("mapToProjectSet_shouldNotThrow_data")
+    void mapToProjectSet_shouldNotThrow(final Set<ProjectDTO> projectsDTO, final Set<Project> availableProjects) {
+        assertDoesNotThrow(() -> projectMapper.mapToProjectSet(projectsDTO, availableProjects));
     }
 
-    private static Stream<Arguments> toProjectSet_dataCausingEmptyOptional() {
+    private static Stream<Arguments> mapToProjectSet_shouldNotThrow_data() {
         return Stream.of(
                 Arguments.of(null, null),
-                Arguments.of(null, Collections.emptySet()),
-                Arguments.of(null, databaseProjectsSet()),
                 Arguments.of(Collections.emptySet(), null),
-                Arguments.of(Collections.emptySet(), Collections.emptySet())
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("toProjectSet_expectedProjectSetAndGivenProjectDTOSet")
-    void toProjectSet_shouldReturnProjectSet(final Set<Project> expected, final Set<ProjectDTO> given) {
-        assertEquals(expected, projectMapper.mapToProjectSet(given, databaseProjectsSet()).orElseThrow());
-    }
-
-    private static Stream<Arguments> toProjectSet_expectedProjectSetAndGivenProjectDTOSet() {
-        return Stream.of(
+                Arguments.of(null, Collections.emptySet()),
+                Arguments.of(null, Collections.singleton(null)),
+                Arguments.of(Collections.singleton(null), null),
+                Arguments.of(Collections.singleton(null), Collections.singleton(null)),
                 Arguments.of(Collections.emptySet(), Collections.emptySet()),
-                Arguments.of(getSet(Stream.of(getProject("Projekt II"))), // expected result
-                        getSet(Stream.of(getProjectDTO(null), getProjectDTO("Projekt II")))), // given
-                Arguments.of(getSet(Stream.of(getProject("Projekt I"), getProject("Projekt II"))),
-                        getSet(Stream.of(getProjectDTO("Projekt I"), getProjectDTO("Projekt II")))),
-                Arguments.of(getSet(Stream.of(getProject("Projekt I"), getProject("Projekt II"), getProject("Projekt III"))),
-                        getSet(Stream.of(getProjectDTO("Projekt I"), getProjectDTO("Projekt II"), getProjectDTO("Projekt III")))),
-                Arguments.of(getSet(Stream.of(getProject("Projekt I"), getProject("Projekt II"), getProject("Projekt III"))),
-                        getSet(Stream.of(getProjectDTO("Projekt I"), getProjectDTO("Projekt II"), getProjectDTO("Projekt III"), getProjectDTO("Projekt IV")))),
-                Arguments.of(getSet(Stream.of(getProject("Projekt I"), getProject("Projekt III"))),
-                        getSet(Stream.of(getProjectDTO("Projekt I"), getProjectDTO("Projekt III")))),
-                Arguments.of(getSet(Stream.of(getProject("Projekt II"), getProject("Projekt III"))),
-                        getSet(Stream.of(getProjectDTO("Projekt II"), getProjectDTO("Projekt III")))),
-                Arguments.of(getSet(Stream.of(getProject("Projekt II"), getProject("Projekt I"))),
-                        getSet(Stream.of(getProjectDTO("Projekt II"), getProjectDTO("Projekt I")))),
-                Arguments.of(getSet(Stream.of(getProject("Projekt II"), getProject("Projekt I"))),
-                        getSet(Stream.of(getProjectDTO("Projekt II"), getProjectDTO("Projekt I"), getProjectDTO("Projekt I"))))
+                Arguments.of(Collections.singleton(ProjectDTO.builder().build()), Collections.emptySet()),
+                Arguments.of(Collections.emptySet(), Collections.singleton(new Project())),
+                Arguments.of(Collections.singleton(ProjectDTO.builder().build()), Collections.singleton(new Project())),
+                Arguments.of(Collections.singleton(ProjectDTO.builder().build()), Collections.singleton(getProjectWithRole(null))),
+                Arguments.of(Collections.singleton(ProjectDTO.builder().build()),
+                        Collections.singleton(getProjectWithRole(Collections.emptySet()))),
+                Arguments.of(Collections.singleton(ProjectDTO.builder().build()),
+                        Collections.singleton(getProjectWithRole(Collections.singleton(null)))),
+                Arguments.of(Collections.singleton(ProjectDTO.builder().build()),
+                        Collections.singleton(getProjectWithRole(Collections.singleton(new ProjectRole()))))
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("mapToProjectDTOList_expectedProjectDTOListAndGivenProjectSet")
-    void mapToProjectDTOList_shouldReturnNullOrProjectDTOList(final List<ProjectDTO> expected, final Set<Project> given) {
-        assertEquals(expected, projectMapper.mapToProjectDTOList(given));
-    }
-
-    private static Stream<Arguments> mapToProjectDTOList_expectedProjectDTOListAndGivenProjectSet() {
-        return Stream.of(
-                Arguments.of(null, null),
-                Arguments.of(Collections.singletonList(getProjectDTO(null)), getSet(Stream.of(new Project()))),
-                Arguments.of(Collections.singletonList(getProjectDTO("example")), getSet(Stream.of(getProject("example"))))
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("mapToProjectDTO_expectedProjectDTOAndGivenProject")
-    void mapToProjectDTO_shouldReturnNullOrProjectDTO(final ProjectDTO expected, final Project given) {
-        assertEquals(expected, projectMapper.mapToProjectDTO(given));
-    }
-
-    private static Stream<Arguments> mapToProjectDTO_expectedProjectDTOAndGivenProject() {
-        return Stream.of(
-                Arguments.of(null, null),
-                Arguments.of(getProjectDTO(null), getProject(null)),
-                Arguments.of(getProjectDTO("example"), getProject("example"))
-        );
-    }
-
-    private static ProjectDTO getProjectDTO(final String name) {
-        return ProjectDTO.builder().name(name).role(null).build();
-    }
-
-    private static Project getProject(final String name) {
+    private static Project getProjectWithRole(final Set<ProjectRole> projectRole) {
         final var project = new Project();
-        project.setName(name);
-        project.setYear(Calendar.getInstance().get(Calendar.YEAR));
+
+        project.setProjectRoles(projectRole);
+
         return project;
     }
 
-    private static Set<Object> getSet(Stream<Object> stream) {
-        return stream.collect(Collectors.toSet());
+    @ParameterizedTest
+    @MethodSource("mapToProjectResponsesDTO_shouldNotThrow_data")
+    void mapToProjectResponsesDTO_shouldNotThrow(final Set<Project> projects) {
+        assertDoesNotThrow(() -> projectMapper.mapToProjectResponsesDTO(projects));
     }
 
-    private static Set<Project> databaseProjectsSet() {
-        return new HashSet<>(Arrays.asList(getProject("Projekt I"), getProject("Projekt II"), getProject("Projekt III")));
+    private static Stream<Set<Project>> mapToProjectResponsesDTO_shouldNotThrow_data() {
+        return Stream.of(
+                null,
+                Collections.emptySet(),
+                Collections.singleton(null),
+                Collections.singleton(new Project())
+        );
     }
 
 }

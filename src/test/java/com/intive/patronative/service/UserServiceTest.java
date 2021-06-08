@@ -1,5 +1,7 @@
 package com.intive.patronative.service;
 
+import com.intive.patronative.mapper.RolesInProjectMapper;
+import com.intive.patronative.repository.RolesInProjectRepository;
 import com.intive.patronative.repository.StatusRepository;
 import com.intive.patronative.mapper.UserMapper;
 import com.intive.patronative.validation.UserValidator;
@@ -29,6 +31,8 @@ import java.util.Collections;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -36,13 +40,17 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
     @Mock
     private StatusRepository statusRepository;
+    @Mock
+    private RolesInProjectRepository rolesInProjectRepository;
     @Mock
     private UserSearchValidator userSearchValidator;
     @Mock
     private UserValidator userValidator;
+    @Mock
+    private RolesInProjectMapper rolesInProjectMapper;
     @Mock
     private UserMapper userMapper;
     @InjectMocks
@@ -59,7 +67,7 @@ class UserServiceTest {
     @ParameterizedTest
     @MethodSource("validProjectSet")
     void updateUser_shouldNotThrow(final Set<Project> projects) {
-        Mockito.when(userRepository.findByLogin("login")).thenReturn(Optional.of(exampleUser()));
+        Mockito.when(userRepository.findByLogin(any())).thenReturn(Optional.of(exampleUser()));
         Mockito.when(projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR))).thenReturn(projects);
         assertDoesNotThrow(() -> userService.updateUser(new UserEditDTO("login", null, null, null, null, null, null,
                 Collections.singleton(ProjectDTO.builder().name("exampleProjectName").role("projectRole").build()))));
@@ -76,14 +84,6 @@ class UserServiceTest {
     void updateUser_shouldThrowInvalidArgumentException(final UserEditDTO userEditDTO) {
         Mockito.doThrow(InvalidArgumentException.class).when(userValidator).validateUserData(userEditDTO);
         assertThrows(InvalidArgumentException.class, () -> userService.updateUser(userEditDTO));
-    }
-
-    @ParameterizedTest
-    @MethodSource("validLogin")
-    void getUser_shouldNotThrow(final String login) {
-        Mockito.when(userRepository.findByLogin(login)).thenReturn(Optional.of(exampleUser()));
-        Mockito.when(userValidator.isLoginValid(login)).thenReturn(true);
-        assertDoesNotThrow(() -> userService.getUserByLogin(login));
     }
 
     @ParameterizedTest

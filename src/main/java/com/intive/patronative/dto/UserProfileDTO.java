@@ -4,7 +4,7 @@ import com.intive.patronative.dto.profile.UserStatus;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
+import java.util.Set;
 
 @Value
 @Builder
@@ -14,7 +14,7 @@ public class UserProfileDTO {
     String firstName;
     String lastName;
     String bio;
-    List<ProjectDTO> projects;
+    Set<ProjectDTO> projects;
     String email;
     String phoneNumber;
     String gitHubUrl;

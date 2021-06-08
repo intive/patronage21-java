@@ -1,5 +1,7 @@
 package com.intive.patronative.repository.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +14,9 @@ import javax.persistence.Table;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "roles_in_project", schema = "patronative")
 public class RolesInProject {
 

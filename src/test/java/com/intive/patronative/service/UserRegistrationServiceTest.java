@@ -6,11 +6,13 @@ import com.intive.patronative.dto.registration.UserGender;
 import com.intive.patronative.exception.AlreadyExistsException;
 import com.intive.patronative.mapper.GroupMapper;
 import com.intive.patronative.mapper.ProjectMapper;
+import com.intive.patronative.mapper.RolesInProjectMapper;
 import com.intive.patronative.mapper.UserMapper;
 import com.intive.patronative.repository.GenderRepository;
 import com.intive.patronative.repository.ProfileRepository;
 import com.intive.patronative.repository.ProjectRepository;
 import com.intive.patronative.repository.RoleRepository;
+import com.intive.patronative.repository.RolesInProjectRepository;
 import com.intive.patronative.repository.StatusRepository;
 import com.intive.patronative.repository.UserRepository;
 import com.intive.patronative.repository.model.User;
@@ -57,6 +59,8 @@ class UserRegistrationServiceTest {
     private ProjectRepository projectRepository;
     @Mock
     private ProfileRepository profileRepository;
+    @Mock
+    private RolesInProjectRepository rolesInProjectRepository;
 
     private UserService userService;
 
@@ -66,8 +70,11 @@ class UserRegistrationServiceTest {
         final var projectMapper = new ProjectMapper();
         final var groupMapper = new GroupMapper();
         final var userMapper = new UserMapper(projectMapper, groupMapper);
-        userService = new UserService(userSearchValidator, technologyGroupsValidator, userValidator, userMapper, userRepository, projectRepository,
-                statusRepository, profileRepository, technologyGroupService, roleRepository, genderRepository);
+        final var rolesInProjectMapper = new RolesInProjectMapper();
+
+        userService = new UserService(userSearchValidator, technologyGroupsValidator, userValidator, userMapper, projectMapper,
+                rolesInProjectMapper, userRepository, projectRepository, statusRepository, profileRepository, rolesInProjectRepository,
+                technologyGroupService, roleRepository, genderRepository);
     }
 
     @Test

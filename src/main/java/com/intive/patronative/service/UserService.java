@@ -1,5 +1,6 @@
 package com.intive.patronative.service;
 
+import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserResponseDTO;
 import com.intive.patronative.dto.UserSearchDTO;
@@ -15,16 +16,21 @@ import com.intive.patronative.exception.InvalidArgumentException;
 import com.intive.patronative.exception.RoleNotFoundException;
 import com.intive.patronative.exception.StatusNotFoundException;
 import com.intive.patronative.exception.UserNotFoundException;
+import com.intive.patronative.mapper.ProjectMapper;
+import com.intive.patronative.mapper.RolesInProjectMapper;
 import com.intive.patronative.mapper.UserMapper;
 import com.intive.patronative.repository.GenderRepository;
 import com.intive.patronative.repository.ProfileRepository;
 import com.intive.patronative.repository.ProjectRepository;
 import com.intive.patronative.repository.RoleRepository;
+import com.intive.patronative.repository.RolesInProjectRepository;
 import com.intive.patronative.repository.StatusRepository;
 import com.intive.patronative.repository.UserRepository;
 import com.intive.patronative.repository.model.Gender;
 import com.intive.patronative.repository.model.Profile;
+import com.intive.patronative.repository.model.Project;
 import com.intive.patronative.repository.model.Role;
+import com.intive.patronative.repository.model.RolesInProject;
 import com.intive.patronative.repository.model.Status;
 import com.intive.patronative.repository.model.User;
 import com.intive.patronative.validation.TechnologyGroupsValidator;
@@ -34,13 +40,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Objects.nonNull;
 
@@ -54,10 +66,13 @@ public class UserService {
 
     private final UserValidator userValidator;
     private final UserMapper userMapper;
+    private final ProjectMapper projectMapper;
+    private final RolesInProjectMapper rolesInProjectMapper;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final StatusRepository statusRepository;
     private final ProfileRepository profileRepository;
+    private final RolesInProjectRepository rolesInProjectRepository;
 
     private final GroupService technologyGroupService;
     private final RoleRepository roleRepository;
@@ -68,9 +83,23 @@ public class UserService {
 
         final var user = userRepository.findByLogin(userEditDTO.getLogin()).orElseThrow(() ->
                 new UserNotFoundException(userEditDTO.getLogin()));
-        final var currentYear = projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR));
+        final var availableProjects = projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR));
+        final var userToStore = userMapper.mapToEntity(userEditDTO, user, availableProjects);
 
-        storeUserInDatabase(userMapper.mapToEntity(userEditDTO, user, currentYear));
+        updateUserInDatabase(userToStore, userEditDTO.getProjects());
+    }
+
+    @Transactional
+    public void updateUserInDatabase(final User user, final Set<ProjectDTO> projectDTOs) {
+        Optional.ofNullable(user)
+                .ifPresent(u -> {
+                    final var storedUser = storeUserInDatabase(u);
+                    final var rolesInProjects = rolesInProjectMapper.mapToRolesInProjectSet(storedUser, projectDTOs);
+
+                    rolesInProjectRepository.deleteAll(rolesInProjectRepository.findAllByUserId(storedUser.getId()));
+
+                    Optional.ofNullable(rolesInProjects).ifPresent(rolesInProjectRepository::saveAll);
+                });
     }
 
     public void deactivateUserByLogin(final String login) {
@@ -94,7 +123,53 @@ public class UserService {
     }
 
     public UserResponseDTO getUserByLogin(final String login) {
-        return new UserResponseDTO(userMapper.mapToUserProfileDTO(getUserFromDatabaseByLogin(login)));
+        final var user = getUserFromDatabaseByLogin(login);
+        final var rolesInProjects = rolesInProjectRepository.findAllByUserId(user.getId());
+        final var userProjects = getUserProjects(user.getProjects(), rolesInProjects);
+
+        return new UserResponseDTO(userMapper.mapToUserProfileDTO(user, userProjects));
+    }
+
+    private Set<Project> getUserProjects(final Set<Project> projects, final Set<RolesInProject> rolesInProjects) {
+        final var userProjects = new HashMap<String, Project>();
+
+        addProjects(userProjects, projects);
+        addRoles(userProjects, rolesInProjects);
+
+        return new HashSet<>(userProjects.values());
+    }
+
+    private void addProjects(final Map<String, Project> userProjects, final Set<Project> projects) {
+        Optional.ofNullable(projects)
+                .ifPresent(items -> items.stream()
+                        .filter(Objects::nonNull)
+                        .forEach(project -> userProjects
+                                .put(project.getName(), Project.builder()
+                                        .name(project.getName())
+                                        .projectRoles(new HashSet<>())
+                                        .build())));
+    }
+
+    private void addRoles(final Map<String, Project> userProjects, final Set<RolesInProject> rolesInProjects) {
+        if (nonNull(userProjects) && !CollectionUtils.isEmpty(rolesInProjects)) {
+            final var projects = new HashSet<>(userProjects.values());
+
+            rolesInProjects.stream()
+                    .filter(rolesInProject -> nonNull(rolesInProject) && hasProject(rolesInProject.getProject(), projects))
+                    .forEach(rolesInProject -> {
+                        final var project = userProjects.get(rolesInProject.getProject().getName());
+                        project.getProjectRoles().add(rolesInProject.getProjectRole());
+                    });
+        }
+    }
+
+    private boolean hasProject(final Project project, final Set<Project> projects) {
+        if (nonNull(project) && !CollectionUtils.isEmpty(projects)) {
+            return projects.stream()
+                    .filter(Objects::nonNull)
+                    .anyMatch(item -> item.getName().equalsIgnoreCase(project.getName()));
+        }
+        return false;
     }
 
     public void deleteImage(final String login) {
@@ -119,8 +194,10 @@ public class UserService {
     }
 
     @Transactional
-    public void storeUserInDatabase(final User user) {
-        userRepository.save(user);
+    public User storeUserInDatabase(final User entityUser) {
+        return Optional.ofNullable(entityUser)
+                .map(userRepository::save)
+                .orElse(null);
     }
 
     @Transactional
@@ -188,4 +265,5 @@ public class UserService {
         return roleRepository.findByName(role)
                 .orElseThrow(() -> new RoleNotFoundException(role.toString()));
     }
+
 }
