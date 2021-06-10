@@ -1,5 +1,6 @@
 package com.intive.patronative.repository.model;
 
+import com.intive.patronative.dto.registration.UserGender;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,6 +8,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,6 +30,7 @@ public class Gender {
     @Setter(AccessLevel.NONE)
     private BigDecimal id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", length = 16, nullable = false)
-    private String name;
+    private UserGender name;
 }

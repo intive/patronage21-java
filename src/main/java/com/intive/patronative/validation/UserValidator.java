@@ -2,6 +2,7 @@ package com.intive.patronative.validation;
 
 import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
+import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,7 +21,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.intive.patronative.validation.ValidationHelper.getFieldError;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -86,6 +86,14 @@ public class UserValidator {
         }
     }
 
+    public void validateRegistrationData(final UserRegistrationRequestDTO userRegistrationRequestDTO) {
+        final var fieldErrors = getRegistrationFieldErrors(userRegistrationRequestDTO);
+
+        if (!fieldErrors.isEmpty()) {
+            throw new InvalidArgumentException(fieldErrors);
+        }
+    }
+
     public void validateUserImage(final MultipartFile image) {
         final var fieldError = checkImage(image);
 
@@ -97,26 +105,39 @@ public class UserValidator {
     private List<FieldError> getFieldErrors(final UserEditDTO userEditDTO) {
         return Optional.ofNullable(userEditDTO)
                 .map(user -> Stream
-                        .of(checkLogin(user.getLogin()),
-                                checkFirstName(user.getFirstName()),
-                                checkLastName(user.getLastName()),
-                                checkEmail(user.getEmail()),
-                                checkPhone(user.getPhoneNumber()),
-                                checkGithub(user.getGitHubUrl()),
-                                checkBio(user.getBio()),
+                        .of(checkLogin(user.getLogin(), false),
+                                checkFirstName(user.getFirstName(), false),
+                                checkLastName(user.getLastName(), false),
+                                checkEmail(user.getEmail(), false),
+                                checkPhone(user.getPhoneNumber(), false),
+                                checkGithub(user.getGitHubUrl(), false),
+                                checkBio(user.getBio(), false),
                                 checkProjects(user.getProjects()))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
     }
 
-    private FieldError checkLogin(final String login) {
+    private List<FieldError> getRegistrationFieldErrors(final UserRegistrationRequestDTO userRegistrationRequestDTO) {
+        return Optional.ofNullable(userRegistrationRequestDTO)
+                .map(user -> Stream
+                        .of(checkLogin(userRegistrationRequestDTO.getLogin(), true),
+                                checkFirstName(userRegistrationRequestDTO.getFirstName(), true),
+                                checkLastName(userRegistrationRequestDTO.getLastName(), true),
+                                checkEmail(userRegistrationRequestDTO.getEmail(), true),
+                                checkPhone(userRegistrationRequestDTO.getPhoneNumber(), true),
+                                checkGithub(userRegistrationRequestDTO.getGitHubUrl(), true))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    private FieldError checkLogin(final String login, final boolean isRequired) {
         final var loginMessage = "Letters and numbers, " + ValidationHelper.getMinMaxCharactersMessage(minLoginLength, maxLoginLength);
 
-        return (login == null) || (ValidationHelper.checkLength(login, minLoginLength, maxLoginLength)
-                && (isLoginValid(login)))
-                ? null
-                : ValidationHelper.getFieldError("login", login, loginMessage);
+        return (isRequired || login != null) && !(ValidationHelper.checkLength(login, minLoginLength, maxLoginLength) && isLoginValid(login))
+                ? ValidationHelper.getFieldError("login", login, loginMessage)
+                : null;
     }
 
     public boolean isLoginValid(final String login) {
@@ -124,14 +145,13 @@ public class UserValidator {
                 && LOGIN_MATCHER.reset(login).matches();
     }
 
-    private FieldError checkFirstName(final String firstName) {
+    private FieldError checkFirstName(final String firstName, final boolean isRequired) {
         final var firstNameMessage = "Only letters, " +
                 ValidationHelper.getMinMaxCharactersMessage(minFirstNameLength, maxFirstNameLength);
 
-        return (firstName == null) || (ValidationHelper.checkLength(firstName, minFirstNameLength, maxFirstNameLength)
-                && (isFirstNameValid(firstName)))
-                ? null
-                : ValidationHelper.getFieldError("firstName", firstName, firstNameMessage);
+        return (isRequired || firstName != null) && !(ValidationHelper.checkLength(firstName, minFirstNameLength, maxFirstNameLength) && isFirstNameValid(firstName))
+                ? ValidationHelper.getFieldError("firstName", firstName, firstNameMessage)
+                : null;
     }
 
     public boolean isFirstNameValid(final String firstName) {
@@ -139,14 +159,13 @@ public class UserValidator {
                 && FIRST_NAME_MATCHER.reset(firstName).matches();
     }
 
-    private FieldError checkLastName(final String lastName) {
+    private FieldError checkLastName(final String lastName, final boolean isRequired) {
         final var lastNameMessage = "Only letters, dash or space allowed for two part surnames, each surname " +
                 ValidationHelper.getMinMaxCharactersMessage(minLastNameLength, maxLastNameLength);
 
-        return (lastName == null) || (ValidationHelper.checkLength(lastName, minLastNameLength, maxLastNameLength)
-                && (isLastNameValid(lastName)))
-                ? null
-                : ValidationHelper.getFieldError("lastName", lastName, lastNameMessage);
+        return (isRequired || lastName != null) && !(ValidationHelper.checkLength(lastName, minLastNameLength, maxLastNameLength) && isLastNameValid(lastName))
+                ? ValidationHelper.getFieldError("lastName", lastName, lastNameMessage)
+                : null;
     }
 
     public boolean isLastNameValid(final String lastName) {
@@ -154,13 +173,13 @@ public class UserValidator {
                 && LAST_NAME_MATCHER.reset(lastName).matches();
     }
 
-    private FieldError checkEmail(final String email) {
+    private FieldError checkEmail(final String email, final boolean isRequired) {
         final var emailMessage = "Example e-mail: example.Mail123@mail.com, username part " +
                 ValidationHelper.getMinMaxCharactersMessage(minEmailUsernameLength, maxEmailUsernameLength);
 
-        return (email == null) || (isEmailValid(email))
-                ? null
-                : ValidationHelper.getFieldError("email", email, emailMessage);
+        return (isRequired || email != null) && !isEmailValid(email)
+                ? ValidationHelper.getFieldError("email", email, emailMessage)
+                : null;
     }
 
     private boolean isEmailValid(final String email) {
@@ -181,12 +200,12 @@ public class UserValidator {
         return false;
     }
 
-    private FieldError checkPhone(final String phone) {
+    private FieldError checkPhone(final String phone, final boolean isRequired) {
         final var phoneMessage = phoneNumberLength + " digits required";
 
-        return (phone == null) || (isPhoneValid(phone))
-                ? null
-                : ValidationHelper.getFieldError("phone", phone, phoneMessage);
+        return (isRequired || phone != null) && !isPhoneValid(phone)
+                ? ValidationHelper.getFieldError("phone", phone, phoneMessage)
+                : null;
     }
 
     private boolean isPhoneValid(final String phone) {
@@ -195,14 +214,14 @@ public class UserValidator {
                 && PHONE_MATCHER.reset(phone).matches();
     }
 
-    private FieldError checkGithub(final String github) {
+    private FieldError checkGithub(final String github, final boolean isRequired) {
         final var githubMessage = "Letters, numbers and dashes allowed, username minimum " + minGithubUsernameLength +
                 " characters, should start with " + FULL_GITHUB_LINK + ", username cannot start or end with dash, username cannot exceed " +
                 maxGithubUsernameLength;
 
-        return (github == null) || (isGithubValid(github))
-                ? null
-                : ValidationHelper.getFieldError("github", github, githubMessage);
+        return (isRequired || github != null) && !isGithubValid(github)
+                ? ValidationHelper.getFieldError("github", github, githubMessage)
+                : null;
     }
 
     private boolean isGithubValid(final String github) {
@@ -223,12 +242,12 @@ public class UserValidator {
         return false;
     }
 
-    private FieldError checkBio(final String bio) {
+    private FieldError checkBio(final String bio, final boolean isRequired) {
         final var bioMessage = "Up to " + MAX_BIO_LENGTH_IN_DATABASE + " characters";
 
-        return (bio == null) || (isBioValid(bio))
-                ? null
-                : ValidationHelper.getFieldError("bio", bio, bioMessage);
+        return (isRequired || bio != null) && !isBioValid(bio)
+                ? ValidationHelper.getFieldError("bio", bio, bioMessage)
+                : null;
     }
 
     private boolean isBioValid(final String bio) {

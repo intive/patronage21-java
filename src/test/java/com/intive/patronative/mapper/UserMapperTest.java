@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
-    private final UserMapper userMapper = new UserMapper(new ProjectMapper());
+    private final UserMapper userMapper = new UserMapper(new ProjectMapper(), new GroupMapper());
 
     @ParameterizedTest
     @MethodSource("mapToEntity_testDataProvider")
