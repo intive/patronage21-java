@@ -67,7 +67,7 @@ public class UserService {
         userValidator.validateUserData(userEditDTO);
 
         final var user = userRepository.findByLogin(userEditDTO.getLogin()).orElseThrow(() ->
-                new UserNotFoundException("login", userEditDTO.getLogin()));
+                new UserNotFoundException(userEditDTO.getLogin()));
         final var currentYear = projectRepository.findAllByYear(Calendar.getInstance().get(Calendar.YEAR));
 
         storeUserInDatabase(userMapper.mapToEntity(userEditDTO, user, currentYear));
@@ -136,7 +136,7 @@ public class UserService {
             throw new InvalidArgumentException("login", login);
         }
 
-        return userRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException("login", login));
+        return userRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException(login));
     }
 
     private boolean isUserActive(final User user) {
