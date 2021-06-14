@@ -7,6 +7,7 @@ import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
@@ -26,6 +27,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Component
+@RequiredArgsConstructor
 public class UserValidator {
 
     private static final int MAX_LOGIN_LENGTH_IN_DATABASE = 32;
@@ -50,6 +52,8 @@ public class UserValidator {
             .matcher("");
     private static final Matcher GITHUB_LINK_MATCHER = Pattern.compile("^(https?://)?(www.)?" + BASE_GITHUB_LINK + "$")
             .matcher("");
+
+    private final ValidationHelper validationHelper;
 
     @Value("${validators.user.phone-number.length}")
     private int phoneNumberLength;
@@ -134,11 +138,12 @@ public class UserValidator {
     }
 
     private FieldError checkLogin(final String login, final boolean isRequired) {
-        final var loginMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLoginMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minLoginLength, maxLoginLength));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationLoginMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minLoginLength, maxLoginLength);
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return (isRequired || login != null) && !(ValidationHelper.checkLength(login, minLoginLength, maxLoginLength) && isLoginValid(login))
-                ? ValidationHelper.getFieldError("login", login, loginMessage)
+        return (isRequired || login != null) && !(validationHelper.checkLength(login, minLoginLength, maxLoginLength) && isLoginValid(login))
+                ? validationHelper.getFieldError("login", login, message)
                 : null;
     }
 
@@ -148,11 +153,12 @@ public class UserValidator {
     }
 
     private FieldError checkFirstName(final String firstName, final boolean isRequired) {
-        final var firstNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationFirstNameMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minFirstNameLength, maxFirstNameLength));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationFirstNameMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minFirstNameLength, maxFirstNameLength);
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return (isRequired || firstName != null) && !(ValidationHelper.checkLength(firstName, minFirstNameLength, maxFirstNameLength) && isFirstNameValid(firstName))
-                ? ValidationHelper.getFieldError("firstName", firstName, firstNameMessage)
+        return (isRequired || firstName != null) && !(validationHelper.checkLength(firstName, minFirstNameLength, maxFirstNameLength) && isFirstNameValid(firstName))
+                ? validationHelper.getFieldError("firstName", firstName, message)
                 : null;
     }
 
@@ -162,11 +168,12 @@ public class UserValidator {
     }
 
     private FieldError checkLastName(final String lastName, final boolean isRequired) {
-        final var lastNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLastNameMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minLastNameLength, maxLastNameLength));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationLastNameMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minLastNameLength, maxLastNameLength);
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return (isRequired || lastName != null) && !(ValidationHelper.checkLength(lastName, minLastNameLength, maxLastNameLength) && isLastNameValid(lastName))
-                ? ValidationHelper.getFieldError("lastName", lastName, lastNameMessage)
+        return (isRequired || lastName != null) && !(validationHelper.checkLength(lastName, minLastNameLength, maxLastNameLength) && isLastNameValid(lastName))
+                ? validationHelper.getFieldError("lastName", lastName, message)
                 : null;
     }
 
@@ -176,11 +183,12 @@ public class UserValidator {
     }
 
     private FieldError checkEmail(final String email, final boolean isRequired) {
-        final var emailMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationEmailMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minEmailUsernameLength, maxEmailUsernameLength));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationEmailMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minEmailUsernameLength, maxEmailUsernameLength);
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
         return (isRequired || email != null) && !isEmailValid(email)
-                ? ValidationHelper.getFieldError("email", email, emailMessage)
+                ? validationHelper.getFieldError("email", email, message)
                 : null;
     }
 
@@ -193,7 +201,7 @@ public class UserValidator {
                 final var emailBase = splitEmailByAt[1];
 
                 return (email.length() <= MAX_EMAIL_LENGTH_IN_DATABASE)
-                        && ValidationHelper.checkLength(emailUsername, minEmailUsernameLength, maxEmailUsernameLength)
+                        && validationHelper.checkLength(emailUsername, minEmailUsernameLength, maxEmailUsernameLength)
                         && EMAIL_USERNAME_MATCHER.reset(emailUsername).matches()
                         && EMAIL_BASE_MATCHER.reset(emailBase).matches();
             }
@@ -203,27 +211,27 @@ public class UserValidator {
     }
 
     private FieldError checkPhone(final String phone, final boolean isRequired) {
-        final var phoneMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationPhoneMessage"),
-                phoneNumberLength);
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationPhoneMessage");
+        final var message = validationHelper.getFormattedMessage(localeMessage, phoneNumberLength);
 
         return (isRequired || phone != null) && !isPhoneValid(phone)
-                ? ValidationHelper.getFieldError("phone", phone, phoneMessage)
+                ? validationHelper.getFieldError("phone", phone, message)
                 : null;
     }
 
     private boolean isPhoneValid(final String phone) {
         return (phone != null) && (phone.length() <= MAX_PHONE_NUMBER_LENGTH_IN_DATABASE)
-                && ValidationHelper.checkLength(phone, phoneNumberLength, phoneNumberLength)
+                && validationHelper.checkLength(phone, phoneNumberLength, phoneNumberLength)
                 && PHONE_MATCHER.reset(phone).matches();
     }
 
     private FieldError checkGithub(final String github, final boolean isRequired) {
-        final var githubMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationGithubMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minGithubUsernameLength, maxGithubUsernameLength),
-                FULL_GITHUB_LINK);
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationGithubMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minGithubUsernameLength, maxGithubUsernameLength);
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage, FULL_GITHUB_LINK);
 
         return (isRequired || github != null) && !isGithubValid(github)
-                ? ValidationHelper.getFieldError("github", github, githubMessage)
+                ? validationHelper.getFieldError("github", github, message)
                 : null;
     }
 
@@ -236,7 +244,7 @@ public class UserValidator {
                 final var githubUsername = splitGithubByBaseLink[1];
 
                 return (github.length() <= MAX_GITHUB_URL_LENGTH_IN_DATABASE)
-                        && ValidationHelper.checkLength(githubUsername, minGithubUsernameLength, maxGithubUsernameLength)
+                        && validationHelper.checkLength(githubUsername, minGithubUsernameLength, maxGithubUsernameLength)
                         && GITHUB_USERNAME_MATCHER.reset(githubUsername).matches()
                         && GITHUB_LINK_MATCHER.reset(githubLink).matches();
             }
@@ -246,11 +254,11 @@ public class UserValidator {
     }
 
     private FieldError checkBio(final String bio, final boolean isRequired) {
-        final var bioMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationBioMessage"),
-                MAX_BIO_LENGTH_IN_DATABASE);
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationBioMessage");
+        final var message = validationHelper.getFormattedMessage(localeMessage, MAX_BIO_LENGTH_IN_DATABASE);
 
         return (isRequired || bio != null) && !isBioValid(bio)
-                ? ValidationHelper.getFieldError("bio", bio, bioMessage)
+                ? validationHelper.getFieldError("bio", bio, message)
                 : null;
     }
 
@@ -259,26 +267,26 @@ public class UserValidator {
     }
 
     private FieldError checkProjects(final Set<ProjectDTO> projects) {
-        final var projectMaxParticipationMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationProjectsMessage"),
-                projectsParticipationLimit);
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationProjectsMessage");
+        final var message = validationHelper.getFormattedMessage(localeMessage, projectsParticipationLimit);
 
         return (projects == null) || (projects.size() <= projectsParticipationLimit)
                 ? null
-                : ValidationHelper.getFieldError("projects", "", projectMaxParticipationMessage + projectsParticipationLimit);
+                : validationHelper.getFieldError("projects", "", message + projectsParticipationLimit);
     }
 
     private FieldError checkImage(final MultipartFile image) {
-        final var allowedImageFormatsMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationImageFormatMessage"),
-                ALLOWED_IMAGE_TYPES.toString());
+        final var localeImageFormatMessage = LocaleConfig.getLocaleMessage("validationImageFormatMessage");
+        final var imageFormatMessage = validationHelper.getFormattedMessage(localeImageFormatMessage, ALLOWED_IMAGE_TYPES);
         final var imageNotFoundMessage = LocaleConfig.getLocaleMessage("validationImageNotSentMessage");
 
         if (isNull(image)) {
-            return ValidationHelper.getFieldError("image", null, imageNotFoundMessage);
+            return validationHelper.getFieldError("image", null, imageNotFoundMessage);
         }
 
         return isImageValid(image)
                 ? null
-                : ValidationHelper.getFieldError("image", image.getContentType(), allowedImageFormatsMessage);
+                : validationHelper.getFieldError("image", image.getContentType(), imageFormatMessage);
     }
 
     public static boolean isImageValid(final MultipartFile image) {
