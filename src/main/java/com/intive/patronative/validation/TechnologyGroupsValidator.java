@@ -1,11 +1,13 @@
 package com.intive.patronative.validation;
 
+import com.intive.patronative.config.LocaleConfig;
 import com.intive.patronative.dto.registration.TechnologyGroupDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -16,9 +18,9 @@ import java.util.stream.Stream;
 public class TechnologyGroupsValidator {
 
     private static final int TECHNOLOGY_GROUP_MAX_NAME_LENGTH = 32;
-    private static final String TECHNOLOGY_GROUP_MAX_NAME_LENGTH_MESSAGE = "Technology group name cannot be empty, up to " +
-            TechnologyGroupsValidator.TECHNOLOGY_GROUP_MAX_NAME_LENGTH + ".";
-    private static final String TECHNOLOGY_GROUP_EMPTY_MESSAGE = "Technology groups cannot be empty";
+    private static final String TECHNOLOGY_GROUP_MAX_NAME_LENGTH_MESSAGE = ValidationHelper.getFormattedMessage(LocaleConfig
+            .getLocaleMessage("validationTechnologyGroupMaxNameLengthMessage"), TECHNOLOGY_GROUP_MAX_NAME_LENGTH);
+    private static final String TECHNOLOGY_GROUP_EMPTY_MESSAGE = LocaleConfig.getLocaleMessage("validationEmptyTechnologyGroupMessage");
 
     @Value("${validators.user.technology-groups.minimum-participation}")
     private int technologyGroupMinNumberOfParticipation;
@@ -59,8 +61,8 @@ public class TechnologyGroupsValidator {
 
     private FieldError checkTechnologyGroupsSize(final Set<TechnologyGroupDTO> technologyGroups) {
         final var size = technologyGroups.size();
-        final var message = "Acceptable technology groups you can join is between " +
-                technologyGroupMinNumberOfParticipation + " to " + technologyGroupMaxNumberOfParticipation + ".";
+        final var message = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationTechnologyGroupParticipationMessage"),
+                technologyGroupMinNumberOfParticipation, technologyGroupMaxNumberOfParticipation);
         return (size >= technologyGroupMinNumberOfParticipation && size <= technologyGroupMaxNumberOfParticipation)
                 ? null
                 : getFieldError("current size: " + size, message);
@@ -69,4 +71,5 @@ public class TechnologyGroupsValidator {
     private FieldError getFieldError(final String fieldValue, final String message) {
         return new FieldError("String", "technologyGroups", fieldValue, false, null, null, message);
     }
+
 }
