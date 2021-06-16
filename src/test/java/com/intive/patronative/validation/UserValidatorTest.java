@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@ContextConfiguration(classes = UserValidator.class)
+@ContextConfiguration(classes = {ValidationHelper.class, UserValidator.class})
 class UserValidatorTest {
 
     @Autowired

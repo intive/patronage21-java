@@ -28,6 +28,7 @@ public class UserSearchValidator {
     private static final Matcher TECHNOLOGY_GROUP_MATCHER = Pattern.compile("^[a-zA-ZĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9() -]+$").matcher("");
 
     private final UserValidator userValidator;
+    private final ValidationHelper validationHelper;
 
     @Value("${validators.search.data.length.min}")
     private int minSearchDataLength;
@@ -63,43 +64,47 @@ public class UserSearchValidator {
     }
 
     private FieldError checkLogin(final String login) {
-        final var loginMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLoginMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLoginLength()));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationLoginMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLoginLength());
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return ((login == null) || (ValidationHelper.checkLength(login, minSearchDataLength, userValidator.getMaxLoginLength())
+        return ((login == null) || (validationHelper.checkLength(login, minSearchDataLength, userValidator.getMaxLoginLength())
                 && userValidator.isLoginValid(login)))
                 ? null
-                : ValidationHelper.getFieldError("login", login, loginMessage);
+                : validationHelper.getFieldError("login", login, message);
     }
 
     private FieldError checkFirstName(final String firstName) {
-        final var firstNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationFirstNameMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxFirstNameLength()));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationFirstNameMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxFirstNameLength());
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return ((firstName == null) || (ValidationHelper.checkLength(firstName, minSearchDataLength, userValidator.getMaxFirstNameLength())
+        return ((firstName == null) || (validationHelper.checkLength(firstName, minSearchDataLength, userValidator.getMaxFirstNameLength())
                 && userValidator.isFirstNameValid(firstName)))
                 ? null
-                : ValidationHelper.getFieldError("firstName", firstName, firstNameMessage);
+                : validationHelper.getFieldError("firstName", firstName, message);
     }
 
     private FieldError checkLastName(final String lastName) {
-        final var lastNameMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationLastNameMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLastNameLength()));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationLastNameMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minSearchDataLength, userValidator.getMaxLastNameLength());
+        final var message = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return ((lastName == null) || (ValidationHelper.checkLength(lastName, minSearchDataLength, userValidator.getMaxLastNameLength())
+        return ((lastName == null) || (validationHelper.checkLength(lastName, minSearchDataLength, userValidator.getMaxLastNameLength())
                 && userValidator.isLastNameValid(lastName)))
                 ? null
-                : ValidationHelper.getFieldError("lastName", lastName, lastNameMessage);
+                : validationHelper.getFieldError("lastName", lastName, message);
     }
 
     private FieldError checkOther(final String other) {
-        final var otherMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationOtherMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, maxOtherLength));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationOtherMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minSearchDataLength, maxOtherLength);
+        final var otherMessage = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return ((other == null) || (ValidationHelper.checkLength(other, minSearchDataLength, maxOtherLength)
+        return ((other == null) || (validationHelper.checkLength(other, minSearchDataLength, maxOtherLength)
                 && isOtherValid(other)))
                 ? null
-                : ValidationHelper.getFieldError("other", other, otherMessage);
+                : validationHelper.getFieldError("other", other, otherMessage);
     }
 
     private boolean isOtherValid(final String other) {
@@ -107,13 +112,14 @@ public class UserSearchValidator {
     }
 
     private FieldError checkTechnologyGroup(final String technologyGroup) {
-        final var technologyGroupMessage = ValidationHelper.getFormattedMessage(LocaleConfig.getLocaleMessage("validationTechnologyGroupMessage"),
-                ValidationHelper.getMinMaxCharactersMessage(minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH));
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationTechnologyGroupMessage");
+        final var charactersMessage = validationHelper.getMinMaxCharactersMessage(minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH);
+        final var technologyGroupMessage = validationHelper.getFormattedMessage(localeMessage, charactersMessage);
 
-        return ((technologyGroup == null) || (ValidationHelper.checkLength(technologyGroup, minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH)
+        return ((technologyGroup == null) || (validationHelper.checkLength(technologyGroup, minSearchDataLength, MAX_TECHNOLOGY_GROUP_NAME_LENGTH)
                 && isTechnologyGroupValid(technologyGroup)))
                 ? null
-                : ValidationHelper.getFieldError("technologyGroup", technologyGroup, technologyGroupMessage);
+                : validationHelper.getFieldError("technologyGroup", technologyGroup, technologyGroupMessage);
     }
 
     private boolean isTechnologyGroupValid(final String technologyGroup) {
