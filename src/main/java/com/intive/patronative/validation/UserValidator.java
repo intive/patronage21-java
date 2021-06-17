@@ -280,7 +280,7 @@ public class UserValidator {
         final var imageFormatMessage = validationHelper.getFormattedMessage(localeImageFormatMessage, ALLOWED_IMAGE_TYPES);
         final var imageNotFoundMessage = LocaleConfig.getLocaleMessage("validationImageNotSentMessage");
 
-        if (isNull(image)) {
+        if (isNull(image) || image.isEmpty()) {
             return validationHelper.getFieldError("image", null, imageNotFoundMessage);
         }
 
