@@ -131,7 +131,7 @@ public class UserValidator {
                                 checkLastName(userRegistrationRequestDTO.getLastName(), true),
                                 checkEmail(userRegistrationRequestDTO.getEmail(), true),
                                 checkPhone(userRegistrationRequestDTO.getPhoneNumber(), true),
-                                checkGithub(userRegistrationRequestDTO.getGitHubUrl(), true))
+                                checkGithub(userRegistrationRequestDTO.getGitHubUrl(), false))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
