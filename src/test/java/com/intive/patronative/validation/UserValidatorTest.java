@@ -175,7 +175,6 @@ class UserValidatorTest {
                 new UserEditDTO(null, null, null, null, null, "username", null, null),
                 new UserEditDTO(null, null, null, null, null, "https://github.com/ósername", null, null),
                 new UserEditDTO(null, null, null, null, null, "https://github.com/user_name", null, null),
-                new UserEditDTO(null, null, null, null, null, "https://github.com/use", null, null),
                 new UserEditDTO(null, "Lucas1", "Smith", "lucasSmith@mail.pl", "123456789", "https://github.com/username1234",
                         null, Collections.singleton(ProjectDTO.builder().name("projectName").role("projectRole").build())),
                 new UserEditDTO("SomeLogin", null, null, null, "123456", "https://github.com/-username1234-", null,
