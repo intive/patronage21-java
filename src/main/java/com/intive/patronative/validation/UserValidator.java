@@ -3,6 +3,7 @@ package com.intive.patronative.validation;
 import com.intive.patronative.config.LocaleConfig;
 import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
+import com.intive.patronative.dto.registration.UserGender;
 import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
 import com.intive.patronative.exception.InvalidArgumentException;
 import lombok.AccessLevel;
@@ -131,7 +132,8 @@ public class UserValidator {
                                 checkLastName(userRegistrationRequestDTO.getLastName(), true),
                                 checkEmail(userRegistrationRequestDTO.getEmail(), true),
                                 checkPhone(userRegistrationRequestDTO.getPhoneNumber(), true),
-                                checkGithub(userRegistrationRequestDTO.getGitHubUrl(), false))
+                                checkGithub(userRegistrationRequestDTO.getGitHubUrl(), true),
+                                checkGender(userRegistrationRequestDTO.getGender()))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
@@ -264,6 +266,14 @@ public class UserValidator {
 
     private boolean isBioValid(final String bio) {
         return (bio != null) && (bio.length() <= MAX_BIO_LENGTH_IN_DATABASE);
+    }
+
+    private FieldError checkGender(final UserGender gender) {
+        final var localeMessage = LocaleConfig.getLocaleMessage("validationGenderMessage");
+
+        return gender == null
+                ? validationHelper.getFieldError("gender", null, localeMessage)
+                : null;
     }
 
     private FieldError checkProjects(final Set<ProjectDTO> projects) {
