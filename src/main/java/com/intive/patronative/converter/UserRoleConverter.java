@@ -14,7 +14,7 @@ import java.util.Collections;
 public class UserRoleConverter implements Converter<String, UserRole> {
 
     @Override
-    public UserRole convert(String source) {
+    public UserRole convert(final String source) {
         try {
             return UserRole.valueOf(source.toUpperCase());
         } catch (IllegalArgumentException exception) {

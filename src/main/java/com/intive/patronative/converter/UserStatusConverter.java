@@ -17,7 +17,7 @@ public class UserStatusConverter implements Converter<String, UserStatus> {
     public UserStatus convert(final String source) {
         try {
             return UserStatus.valueOf(source.toUpperCase());
-        } catch (final IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             final var statusMessage = LocaleConfig.getLocaleMessage("userStatusConverterMessage") + Arrays.toString(UserStatus.values());
 
             throw new InvalidArgumentException(Collections.singletonList(

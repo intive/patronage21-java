@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,10 +40,29 @@ class UserMapperTest {
     }
 
     @ParameterizedTest
+    @MethodSource("mapToUserProfileDTO_shouldNotThrow_data")
+    void mapToUserProfileDTO_shouldNotThrow(final User entityUser, final Set<Project> projects) {
+        assertDoesNotThrow(() -> userMapper.mapToUserProfileDTO(entityUser, projects));
+    }
+
+    private static Stream<Arguments> mapToUserProfileDTO_shouldNotThrow_data() {
+        return Stream.of(
+                Arguments.of(null, null),
+                Arguments.of(new User(), null),
+                Arguments.of(User.builder().projects(Collections.emptySet()).build(), Collections.singleton(null)),
+                Arguments.of(User.builder().projects(Collections.singleton(null)).build(), Collections.emptySet()),
+                Arguments.of(User.builder().projects(Collections.singleton(new Project())).build(), Collections.singleton(null)),
+                Arguments.of(User.builder().projects(Collections.singleton(new Project())).build(), Collections.singleton(new Project())),
+                Arguments.of(User.builder().projects(Collections.singleton(new Project())).build(),
+                        Collections.singleton(Project.builder().projectRoles(Collections.singleton(null)).build()))
+        );
+    }
+
+    @ParameterizedTest
     @MethodSource("mapToUserProfileDTO_testDataProvider")
     void mapToUserProfileDTO_shouldReturnNullOrUserProfileDTO(final UserProfileDTO expectedProfile, final User user) {
         // when
-        final var result = userMapper.mapToUserProfileDTO(user);
+        final var result = userMapper.mapToUserProfileDTO(user, Collections.emptySet());
         // then
         assertEquals(expectedProfile, result);
     }
@@ -49,7 +70,7 @@ class UserMapperTest {
     private static Stream<Arguments> mapToUserProfileDTO_testDataProvider() {
         return Stream.of(
                 Arguments.of(null, null),
-                Arguments.of(UserProfileDTO.builder().build(), new User())
+                Arguments.of(UserProfileDTO.builder().projects(new HashSet<>()).build(), new User())
         );
     }
 
@@ -57,7 +78,7 @@ class UserMapperTest {
         return new UserEditDTO(null, null, null, null, null, null, null, null);
     }
 
-    private static Set<Object> getSet(Stream<Object> stream) {
+    private static Set<Object> getSet(final Stream<Object> stream) {
         return stream.collect(Collectors.toSet());
     }
 

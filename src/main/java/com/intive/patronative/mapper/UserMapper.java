@@ -1,5 +1,6 @@
 package com.intive.patronative.mapper;
 
+import com.intive.patronative.dto.ProjectDTO;
 import com.intive.patronative.dto.UserEditDTO;
 import com.intive.patronative.dto.UserProfileDTO;
 import com.intive.patronative.dto.model.UserDTO;
@@ -7,7 +8,6 @@ import com.intive.patronative.dto.model.UsersDTO;
 import com.intive.patronative.dto.registration.UserRegistrationRequestDTO;
 import com.intive.patronative.dto.registration.UserRegistrationResponseDTO;
 import com.intive.patronative.repository.model.Gender;
-import com.intive.patronative.dto.UserProfileDTO;
 import com.intive.patronative.repository.model.Profile;
 import com.intive.patronative.repository.model.Project;
 import com.intive.patronative.repository.model.Role;
@@ -15,35 +15,42 @@ import com.intive.patronative.repository.model.Status;
 import com.intive.patronative.repository.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 @Component
 @RequiredArgsConstructor
-public class UserMapper extends Mapper {
+public class UserMapper {
 
     private final ProjectMapper projectMapper;
     private final GroupMapper groupMapper;
 
     public User mapToEntity(final UserEditDTO userEditDTO, final User user, final Set<Project> availableProjects) {
         if (userEditDTO != null && user != null) {
-            user.setFirstName(swapValues(userEditDTO.getFirstName(), user.getFirstName()));
-            user.setLastName(swapValues(userEditDTO.getLastName(), user.getLastName()));
-            user.setEmail(swapValues(userEditDTO.getEmail(), user.getEmail()));
-            user.setPhoneNumber(swapValues(userEditDTO.getPhoneNumber(), user.getPhoneNumber()));
-            user.setGitHubUrl(swapValues(userEditDTO.getGitHubUrl(), user.getGitHubUrl()));
+            user.setFirstName(Optional.ofNullable(userEditDTO.getFirstName()).orElse(user.getFirstName()));
+            user.setLastName(Optional.ofNullable(userEditDTO.getLastName()).orElse(user.getLastName()));
+            user.setEmail(Optional.ofNullable(userEditDTO.getEmail()).orElse(user.getEmail()));
+            user.setPhoneNumber(Optional.ofNullable(userEditDTO.getPhoneNumber()).orElse(user.getPhoneNumber()));
+            user.setGitHubUrl(Optional.ofNullable(userEditDTO.getGitHubUrl()).orElse(user.getGitHubUrl()));
             user.setProjects(projectMapper.mapToProjectSet(userEditDTO.getProjects(), availableProjects).orElse(user.getProjects()));
             if (user.getProfile() != null) {
-                user.getProfile().setBio(swapValues(userEditDTO.getBio(), user.getProfile().getBio()));
+                user.getProfile().setBio(Optional.ofNullable(userEditDTO.getBio()).orElse(user.getProfile().getBio()));
             }
         }
         return user;
     }
 
-    public UserProfileDTO mapToUserProfileDTO(final User entityUser) {
+    public UserProfileDTO mapToUserProfileDTO(final User entityUser, final Set<Project> projects) {
         return Optional.ofNullable(entityUser)
                 .map(user -> UserProfileDTO
                         .builder()
@@ -55,10 +62,38 @@ public class UserMapper extends Mapper {
                         .gitHubUrl(user.getGitHubUrl())
                         .email(user.getEmail())
                         .phoneNumber(user.getPhoneNumber())
-                        .projects(projectMapper.mapToProjectDTOList(user.getProjects()))
                         .status(Optional.ofNullable(user.getStatus()).map(Status::getName).orElse(null))
+                        .projects(mapToProjectDTOSet(projects))
                         .build())
                 .orElse(null);
+    }
+
+    private Set<ProjectDTO> mapToProjectDTOSet(final Set<Project> projects) {
+        final var projectDTOs = new HashSet<ProjectDTO>();
+
+        if (!CollectionUtils.isEmpty(projects)) {
+            projects.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(project -> addProjectDTO(projectDTOs, project));
+        }
+
+        return projectDTOs;
+    }
+
+    private void addProjectDTO(final Set<ProjectDTO> destination, final Project project) {
+        if (nonNull(project) && nonNull(destination)) {
+            if (CollectionUtils.isEmpty(project.getProjectRoles()) && isNotBlank(project.getName())) {
+                destination.add(ProjectDTO.builder().name(trim(project.getName())).build());
+            }
+
+            Optional.ofNullable(project.getProjectRoles())
+                    .ifPresent(roles -> roles.stream().filter(Objects::nonNull)
+                            .forEach(role -> destination.add(ProjectDTO.builder()
+                                    .name(project.getName())
+                                    .role(role.getName())
+                                    .build())));
+
+        }
     }
 
     public UserDTO mapEntityToUserResponse(final User user) {
@@ -109,4 +144,5 @@ public class UserMapper extends Mapper {
                         .build())
                 .orElse(null);
     }
+
 }

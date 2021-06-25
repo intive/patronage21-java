@@ -1,8 +1,11 @@
 package com.intive.patronative.repository.model;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -20,8 +23,11 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(exclude = {"id", "users"})
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"id", "users"})
 @Table(name = "project", schema = "patronative")
 public class Project {
     @Id
