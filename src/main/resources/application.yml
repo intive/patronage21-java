@@ -43,7 +43,7 @@ validators:
       length: 9
     github-username:
       length:
-        min: 4
+        min: 3
         max: 39
     projects:
       maximum-participation: 5
