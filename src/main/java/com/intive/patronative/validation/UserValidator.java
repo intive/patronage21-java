@@ -47,7 +47,7 @@ public class UserValidator {
             .matcher("");
     private static final Matcher LOGIN_MATCHER = Pattern.compile("^[a-zA-Z0-9]+$").matcher("");
     private static final Matcher EMAIL_USERNAME_MATCHER = Pattern.compile("^[a-zA-Z0-9.]+$").matcher("");
-    private static final Matcher EMAIL_BASE_MATCHER = Pattern.compile("^@[a-zA-Z]{1,15}[.][a-z]{1,5}$").matcher("");
+    private static final Matcher EMAIL_BASE_MATCHER = Pattern.compile("^@[a-zA-Z0-9]{1,15}[.][a-z]{1,5}$").matcher("");
     private static final Matcher PHONE_MATCHER = Pattern.compile("^[0-9]+$").matcher("");
     private static final Matcher GITHUB_USERNAME_MATCHER = Pattern.compile("^[a-zA-Z0-9]+([- ][a-zA-Z0-9]+)*$")
             .matcher("");
